@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;700&display=swap">
 <style>
-/* Layout: columna única en celular; en escritorio el hero parte en texto + visor 3D con su configurador pegado abajo. */
+/* Layout: una página de escenas a pantalla completa (scroll-snap suave). Cada escena entra con sus elementos en cascada y sale atenuándose; el visor 3D y el celular escaneando viven dentro de sus escenas. */
 :root {
   --bg: #eef0f4;
   --surface: #ffffff;
@@ -75,7 +75,7 @@ a { color: inherit; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
 
 /* Header */
-.head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 16px; }
+.head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px; }
 .brand { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; text-decoration: none; display: flex; align-items: center; gap: 8px; }
 .brand i { width: 12px; height: 12px; border-radius: 50%; background: var(--star); display: inline-block; }
 .nav { display: flex; gap: 20px; font-size: 0.95rem; }
@@ -98,7 +98,7 @@ a { color: inherit; }
 .btn svg { width: 20px; height: 20px; flex: none; }
 
 /* Hero */
-.hero { display: grid; gap: 28px; padding-block: 12px 56px; align-items: center; }
+.hero { display: grid; gap: 22px; align-items: center; }
 .hero-copy { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
 .eyebrow { font-size: 0.78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .eyebrow::before { content: "★★★★★"; color: var(--star); letter-spacing: 2px; margin-right: 10px; }
@@ -107,14 +107,15 @@ a { color: inherit; }
 .ticks { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--muted); font-size: 0.95rem; }
 .ticks li::before { content: "✓"; color: var(--wa); font-weight: 700; margin-right: 6px; }
 @media (min-width: 900px) {
-  .hero { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 40px; padding-block: 24px 80px; }
+  .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
 }
+@media (max-width: 899px) { .demo { height: min(46svh, 420px); } .hero-copy { gap: 14px; } .ticks { display: none; } }
 
 /* Animación del celular: render real del soporte de bambú + celular que se acerca, escanea y deja la reseña */
-.demo { position: relative; width: 100%; aspect-ratio: 4 / 5; max-height: 660px; border-radius: 26px; overflow: hidden; background: #0b0d12; color: #ffffff; min-width: 0; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); isolation: isolate; }
+.demo { position: relative; height: min(66svh, 620px); max-width: 100%; justify-self: center; aspect-ratio: 4 / 5; border-radius: 26px; overflow: hidden; background: #0b0d12; color: #ffffff; min-width: 0; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); isolation: isolate; }
 .demo-blur { position: absolute; inset: -8%; width: 116%; height: 116%; object-fit: cover; filter: blur(26px) brightness(.55); z-index: -1; }
-.scene { position: absolute; left: 50%; top: 0; height: 100%; aspect-ratio: 4 / 5; transform: translateX(-50%); container-type: inline-size; }
-.scene-img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.dscene { position: absolute; left: 50%; top: 0; height: 100%; aspect-ratio: 4 / 5; transform: translateX(-50%); container-type: inline-size; }
+.dscene-img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .nfc-pulse { position: absolute; left: 52%; top: 40%; width: 0; height: 0; z-index: 2; }
 .nfc-pulse i { position: absolute; left: 0; top: 0; width: 15cqw; height: 15cqw; margin: -7.5cqw 0 0 -7.5cqw; border-radius: 50%; border: .7cqw solid rgba(31,85,224,.75); box-shadow: 0 0 3cqw rgba(31,85,224,.45); opacity: 0; }
 .demo.s-tap .nfc-pulse i { animation: rip 1.4s ease-out infinite; }
@@ -237,28 +238,47 @@ a { color: inherit; }
 .buy-price { font-family: var(--font-display); font-weight: 800; font-size: 2rem; line-height: 1; font-variant-numeric: tabular-nums; }
 .buy-sub { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
 
-/* Secciones */
-section { padding-block: 56px; }
-.sec-head { display: grid; gap: 10px; margin-bottom: 28px; max-width: 40em; }
+/* Secciones = escenas */
+html { scroll-snap-type: y proximity; scroll-padding-top: 0; }
+.scene { position: relative; min-height: 100vh; min-height: 100svh; display: flex; align-items: center; padding-block: 84px 36px; scroll-snap-align: start; overflow: clip; }
+.scene > .inner { width: 100%; }
+.sec-head { display: grid; gap: 10px; margin-bottom: 26px; max-width: 40em; }
 .sec-head p { color: var(--muted); }
 .band { background: var(--surface); }
-.tight-top { padding-top: 0; }
-[id] { scroll-margin-top: 16px; }
+[id] { scroll-margin-top: 0; }
+/* barra superior fija, progreso y puntos de navegación */
+.topbar { position: fixed; z-index: 30; top: 0; left: 0; right: 0; padding-top: env(safe-area-inset-top, 0px); background: color-mix(in srgb, var(--bg) 80%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.prog { height: 3px; background: var(--accent); transform-origin: 0 50%; transform: scaleX(var(--prog, 0)); }
+.dots { position: fixed; z-index: 25; right: max(8px, env(safe-area-inset-right, 0px)); top: 50%; transform: translateY(-50%); display: grid; gap: 2px; }
+.dots a { display: flex; align-items: center; justify-content: flex-end; gap: 10px; min-width: 24px; height: 24px; text-decoration: none; color: var(--ink); font-size: .8rem; font-weight: 600; }
+.dots span { opacity: 0; transform: translateX(6px); transition: opacity .2s, transform .2s; background: var(--surface); padding: 2px 9px; border-radius: 99px; box-shadow: 0 0 0 1px var(--line); pointer-events: none; white-space: nowrap; }
+.dots i { width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--muted); opacity: .45; transition: transform .3s, opacity .3s, background .3s; }
+.dots a[aria-current="true"] i { background: var(--accent); opacity: 1; transform: scale(1.6); }
+@media (hover: hover) { .dots a:hover span { opacity: 1; transform: none; } }
+@media (max-width: 720px) { .dots { display: none; } }
+/* transiciones entre escenas: entran en cascada, salen atenuándose (todo con transform y opacity) */
+.js .scene > .inner { transform: translateY(calc(var(--in, 0) * 44px - var(--out, 0) * 34px)) scale(calc(1 - var(--out, 0) * .05)); opacity: calc(1 - var(--out, 0) * .85 - var(--in, 0) * .5); }
+.js .rv { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .85s cubic-bezier(.2, .8, .2, 1); transition-delay: calc(var(--i, 0) * 70ms); }
+.js .scene.in .rv { opacity: 1; transform: none; }
+.js .scene:not(.in) .rv { transition-delay: 0s; transition-duration: .3s; }
+.js .demo.rv { transform: translateY(28px) scale(.97); }
+.js .scene.in .demo.rv { transform: none; }
 
-.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; counter-reset: paso; }
-.steps li { counter-increment: paso; display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start; }
-.steps li::before {
-  content: counter(paso); font-family: var(--font-display); font-weight: 800; font-size: 1.3rem;
-  width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
-  background: var(--ink); color: var(--bg);
-  transform: scale(var(--pop, 1));
-}
-.steps p { color: var(--muted); margin-top: 4px; }
-@media (min-width: 800px) { .steps { grid-template-columns: repeat(3, 1fr); gap: 32px; } .steps li { grid-template-columns: 1fr; } }
+#pedido .sec-head { margin-bottom: 14px; gap: 6px; }
+#pedido .sec-head h2 { font-size: clamp(1.55rem, 3.6vw, 2.1rem); }
+@media (min-width: 900px) { #pedido .viewer .stage { min-height: 470px; } #pedido .config { padding: 14px 18px; gap: 11px; } #pedido .buy { padding-top: 12px; } }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: paso; }
+.steps li { counter-increment: paso; position: relative; display: grid; gap: 8px; padding: 22px 22px 24px; border-radius: var(--radius); background: var(--bg); box-shadow: 0 0 0 1px var(--line); }
+.steps li::before { content: counter(paso); font-family: var(--font-display); font-weight: 800; font-size: 3rem; line-height: 1; color: var(--accent); }
+.steps h3 { font-size: 1.3rem; }
+.steps p { color: var(--muted); }
+@media (min-width: 800px) { .steps { grid-template-columns: repeat(3, 1fr); gap: 22px; } .steps li { padding: 30px 28px 34px; gap: 12px; } .steps li::before { font-size: 4.2rem; } }
 
-.benefits { display: grid; gap: 28px 40px; }
-/* La raya de arriba es un fondo (no un borde) para poder dibujarla con GSAP al hacer scroll */
-.benefits div { padding-top: 16px; background: linear-gradient(var(--ink), var(--ink)) left top / var(--rule, 100%) 2px no-repeat; }
+.benefits { display: grid; gap: 26px 40px; }
+.benefits div { position: relative; padding-top: 16px; }
+.benefits div::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--ink); }
+.js .benefits div::before { transform: scaleX(0); transform-origin: 0 50%; transition: transform .9s ease calc(var(--i, 0) * 90ms + 250ms); }
+.js .scene.in .benefits div::before { transform: scaleX(1); }
 .benefits p { color: var(--muted); margin-top: 6px; }
 @media (min-width: 700px) { .benefits { grid-template-columns: repeat(2, 1fr); } }
 
@@ -270,7 +290,9 @@ section { padding-block: 56px; }
 .faq details[open] summary::after { content: "–"; }
 .faq details p { color: var(--muted); padding-bottom: 18px; max-width: 40em; }
 
-.contact { display: grid; gap: 20px; justify-items: start; }
+.scene-end { flex-direction: column; align-items: stretch; }
+.scene-end > .inner { margin-block: auto; }
+.contact { display: grid; gap: 18px; justify-items: center; text-align: center; }
 .contact .num { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.6rem, 6vw, 2.4rem); user-select: all; }
 .foot-nav { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-bottom: 14px; }
 .foot-nav a { color: var(--ink); font-weight: 500; text-decoration: none; }
@@ -282,14 +304,14 @@ section { padding-block: 56px; }
   box-shadow: 0 10px 24px -8px rgba(0, 0, 0, .5);
 }
 .wa-float svg { width: 28px; height: 28px; }
-footer { padding-block: 28px 96px; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); }
+footer { padding-block: 22px 28px; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); }
 
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn { transition: none; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; scroll-snap-type: none; } .btn { transition: none; } .js .rv, .js .benefits div::before { transition: none; opacity: 1; transform: none; } .js .scene > .inner { transform: none; opacity: 1; } }
 </style>
 
 </head>
 <body>
-<header class="wrap head">
+<header class="topbar"><div class="prog" id="prog" aria-hidden="true"></div><div class="wrap head">
   <a class="brand" href="#inicio"><i></i><span data-marca>Placas NFC</span></a>
   <nav class="nav" aria-label="Secciones">
     <a href="#como-funciona">Cómo funciona</a>
@@ -297,10 +319,11 @@ footer { padding-block: 28px 96px; color: var(--muted); font-size: 0.85rem; bord
     <a href="#preguntas">Preguntas</a>
   </nav>
   <a class="btn btn-wa btn-sm" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener">WhatsApp</a>
-</header>
-
+</div></header>
+<nav class="dots" id="dots" aria-label="Secciones de la página"></nav>
 <main>
-  <div class="wrap hero" id="inicio">
+  <section class="scene scene-hero" id="inicio" data-nombre="Inicio">
+  <div class="wrap hero inner">
     <div class="hero-copy">
       <p class="eyebrow">Placas NFC para locales de Uruguay</p>
       <h1>Más reseñas en Google con solo acercar el celular</h1>
@@ -321,8 +344,8 @@ footer { padding-block: 28px 96px; color: var(--muted); font-size: 0.85rem; bord
 
     <div class="demo" id="demo" role="img" aria-label="Animación: un celular se acerca a la placa de bambú, la escanea, le salta un aviso y deja la reseña de 5 estrellas.">
       <img class="demo-blur" src="img/taco_bambu_negra_34.jpg" alt="" aria-hidden="true">
-      <div class="scene" aria-hidden="true">
-        <img class="scene-img" src="img/taco_bambu_negra_34.jpg" alt="" width="1080" height="1350" fetchpriority="high">
+      <div class="dscene" aria-hidden="true">
+        <img class="dscene-img" src="img/taco_bambu_negra_34.jpg" alt="" width="1080" height="1350" fetchpriority="high">
         <span class="nfc-pulse"><i></i><i></i><i></i></span>
         <div class="phone" id="phone">
           <span class="side s1"></span><span class="side s2"></span><span class="side s3"></span><span class="side s4"></span>
@@ -348,9 +371,10 @@ footer { padding-block: 28px 96px; color: var(--muted); font-size: 0.85rem; bord
       <p class="demo-cap" id="demo-cap" aria-hidden="true">El cliente acerca el celular</p>
     </div>
   </div>
+  </section>
 
-  <section class="band" id="como-funciona">
-    <div class="wrap">
+  <section class="scene band" id="como-funciona" data-nombre="Cómo funciona">
+    <div class="wrap inner">
       <div class="sec-head">
         <h2>Tres pasos y ya estás juntando reseñas</h2>
       </div>
@@ -362,8 +386,8 @@ footer { padding-block: 28px 96px; color: var(--muted); font-size: 0.85rem; bord
     </div>
   </section>
 
-  <section class="tight-top" id="pedido">
-    <div class="wrap">
+  <section class="scene" id="pedido" data-nombre="Armá tu pedido">
+    <div class="wrap inner">
       <div class="sec-head">
         <h2>Armá tu pedido</h2>
         <p>Elegí cuántas tarjetas querés de cada color y mirá cómo quedan. Cada tarjeta viene con su soporte.</p>
@@ -434,8 +458,8 @@ footer { padding-block: 28px 96px; color: var(--muted); font-size: 0.85rem; bord
     </div>
   </section>
 
-  <section class="band" id="beneficios">
-    <div class="wrap">
+  <section class="scene band" id="beneficios" data-nombre="Beneficios">
+    <div class="wrap inner">
       <div class="sec-head">
         <h2>Por qué le sirve a tu local</h2>
         <p>Muchos clientes conformes no dejan reseña porque se olvidan o les da pereza buscarte. La placa les saca ese trabajo.</p>
@@ -449,8 +473,8 @@ footer { padding-block: 28px 96px; color: var(--muted); font-size: 0.85rem; bord
     </div>
   </section>
 
-  <section id="preguntas">
-    <div class="wrap">
+  <section class="scene" id="preguntas" data-nombre="Preguntas">
+    <div class="wrap inner">
       <div class="sec-head"><h2>Preguntas frecuentes</h2></div>
       <div class="faq">
         <details open><summary>¿El cliente tiene que bajar una app?</summary><p>No. Acerca el celular a la tarjeta y le aparece un aviso que abre directo la página de reseñas de tu local.</p></details>
@@ -466,35 +490,31 @@ footer { padding-block: 28px 96px; color: var(--muted); font-size: 0.85rem; bord
     </div>
   </section>
 
-  <section class="band" id="contacto">
-    <div class="wrap contact">
+  <section class="scene scene-end band" id="contacto" data-nombre="Contacto">
+    <div class="wrap contact inner">
       <h2>Escribinos y te las armamos</h2>
       <p class="lead">Contanos cuántas placas querés y el nombre de tu local. Te respondemos por WhatsApp.</p>
       <div class="num" data-wa-num>095 833 281</div>
       <a class="btn btn-wa" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener">Abrir WhatsApp</a>
     </div>
+    <footer>
+      <div class="wrap">
+        <nav class="foot-nav" aria-label="Pie de página">
+          <a href="#como-funciona">Cómo funciona</a>
+          <a href="#pedido">Armá tu pedido</a>
+          <a href="#preguntas">Preguntas</a>
+          <a data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener">WhatsApp</a>
+        </nav>
+        <p><span data-marca>Placas NFC</span> · Montevideo, Uruguay. Google y el logo de Google son marcas de Google LLC; este sitio no está afiliado a Google.</p>
+      </div>
+    </footer>
   </section>
 </main>
-
-<footer>
-  <div class="wrap">
-    <nav class="foot-nav" aria-label="Pie de página">
-      <a href="#como-funciona">Cómo funciona</a>
-      <a href="#pedido">Armá tu pedido</a>
-      <a href="#preguntas">Preguntas</a>
-      <a data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener">WhatsApp</a>
-    </nav>
-    <p><span data-marca>Placas NFC</span> · Montevideo, Uruguay. Google y el logo de Google son marcas de Google LLC; este sitio no está afiliado a Google.</p>
-  </div>
-</footer>
 
 <a class="wa-float" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener" aria-label="Escribirnos por WhatsApp">
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.100L2 22l5-1.300A10 10 0 1 0 12 2zm0 18.200c-1.500 0-3-.400-4.200-1.200l-.300-.200-3 .800.800-2.900-.200-.300A8.200 8.200 0 1 1 12 20.200zm4.500-6.100c-.200-.100-1.500-.700-1.700-.800-.200-.100-.400-.100-.600.100l-.800 1c-.100.200-.300.200-.500.100a6.700 6.700 0 0 1-3.300-2.900c-.200-.400.200-.400.700-1.300.100-.200 0-.300 0-.500l-.800-1.900c-.200-.500-.400-.400-.600-.400h-.500c-.200 0-.500.100-.700.300-.900.900-1 2.100-.300 3.400a11 11 0 0 0 4.600 4.300c1.700.700 2.400.800 3.200.700.500-.100 1.500-.600 1.700-1.200.200-.600.200-1.100.100-1.200-.100-.100-.200-.200-.500-.300z"/></svg>
 </a>
 
-<!-- GSAP para las animaciones con scroll. Three.js y el modelo del soporte se cargan después, recién cuando el visor se acerca a la pantalla. -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
 /* Cómo está armado este archivo:
    1. CONFIGURACIÓN: los datos que podés cambiar (WhatsApp, marca, precios, colores).
@@ -535,7 +555,6 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
   var count = function () { return state.q.negra + state.q.blanca; };
   var MAX_SHOWN = 12;
   var REDUCE = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
-  var HAS_GSAP = !!window.gsap;
   document.documentElement.lang = "es-UY";
 
   $$("[data-marca]").forEach(function (e) { e.textContent = CONFIG.marca; });
@@ -575,12 +594,17 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     return "https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(msg);
   }
   /* El total cuenta hasta el nuevo valor; los lectores de pantalla reciben solo el valor final */
-  var pricePx = { v: null };
+  var pricePx = { v: null }, priceId = 0;
   function showPrice(v) {
     var el = $("#price");
-    if (pricePx.v === null || REDUCE || !HAS_GSAP) { pricePx.v = v; el.textContent = pesos(v); return; }
-    gsap.to(pricePx, { v: v, duration: 0.55, ease: "power2.out", overwrite: true,
-      onUpdate: function () { el.textContent = pesos(Math.round(pricePx.v)); } });
+    if (pricePx.v === null || REDUCE) { pricePx.v = v; el.textContent = pesos(v); return; }
+    var from = pricePx.v, t0 = performance.now(), id = ++priceId;
+    (function step(now) {
+      if (id !== priceId) return;
+      var k = Math.min(1, (now - t0) / 550), e = 1 - Math.pow(1 - k, 2);
+      pricePx.v = from + (v - from) * e; el.textContent = pesos(Math.round(pricePx.v));
+      if (k < 1) requestAnimationFrame(step);
+    })(t0);
   }
   function refreshUI() {
     var n = count();
@@ -1001,9 +1025,9 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     var group = new THREE.Group(); scene.add(group);
     var target = new THREE.Vector3(0, 50, 0), radius = 300, fitRadius = 300, yawTarget = null;
     var yaw = -0.45, pitch = 0.2, touched = false, t0 = performance.now();
-    /* Entrada de cámara con GSAP: arranca lejos y de arriba, y se acerca girando la primera vez que el visor
+    /* Entrada de cámara: arranca lejos y de arriba, y se acerca girando la primera vez que el visor
        entra en pantalla. Son desvíos que se suman a la cámara, así no pelean con el arrastre del usuario. */
-    var cam = { k: 1, p: 0, y: 0 }, introDone = REDUCE || !HAS_GSAP;
+    var cam = { k: 1, p: 0, y: 0 }, introDone = REDUCE;
     if (!introDone) cam = { k: 1.9, p: 0.5, y: -1.2 };
 
     function build(refit) {
@@ -1075,7 +1099,12 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
 
     viewer.intro = function () {
       if (introDone) return; introDone = true;
-      gsap.to(cam, { k: 1, p: 0, y: 0, duration: 2.2, ease: "power3.inOut" });
+      var c0 = { k: cam.k, p: cam.p, y: cam.y }, t0 = performance.now();
+      (function step(now) {
+        var k = Math.min(1, (now - t0) / 2200), e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+        cam.k = c0.k + (1 - c0.k) * e; cam.p = c0.p * (1 - e); cam.y = c0.y * (1 - e);
+        if (k < 1) requestAnimationFrame(step);
+      })(t0);
     };
     if (!introDone) {
       if ("IntersectionObserver" in window) {
@@ -1147,39 +1176,47 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     lazyIO.observe(stage);
   } else startViewer();
 
-  /* ---------------- Animaciones con scroll (GSAP + ScrollTrigger) ----------------
-     Todo arranca de un estado visible: si GSAP no carga, la página se ve igual, solo que quieta. */
+  /* ---------------- Escenas: entrada en cascada, salida suave, progreso y puntos de navegación ----------------
+     Todo parte de un estado visible: sin JavaScript la página se ve completa (la clase "js" activa las animaciones). */
   (function () {
-    if (!HAS_GSAP || !window.ScrollTrigger) return;
-    gsap.registerPlugin(ScrollTrigger);
-    var mm = gsap.matchMedia();
-
-    mm.add("(prefers-reduced-motion: no-preference)", function () {
-      /* Entrada del hero al cargar */
-      gsap.from(".hero-copy > *", { y: 22, autoAlpha: 0, duration: 0.7, ease: "power3.out", stagger: 0.07, clearProps: "transform,opacity,visibility" });
-      gsap.from("#demo", { y: 30, scale: 0.97, duration: 0.9, ease: "power3.out", delay: 0.1, clearProps: "transform" });
-
-      /* Pasos: suben en cascada y el número hace "pop" */
-      gsap.fromTo(".steps li", { y: 34, "--pop": 0.4 }, { y: 0, "--pop": 1, duration: 0.8, ease: "back.out(1.6)", stagger: 0.14,
-        scrollTrigger: { trigger: ".steps", start: "top 85%", once: true } });
-
-      /* Beneficios: la raya de arriba se dibuja de izquierda a derecha */
-      gsap.fromTo(".benefits > div", { "--rule": "0%" }, { "--rule": "100%", duration: 0.9, ease: "power2.inOut", stagger: 0.12,
-        scrollTrigger: { trigger: ".benefits", start: "top 85%", once: true } });
-
-      /* Preguntas: entran en cascada suave */
-      gsap.from(".faq details", { y: 18, duration: 0.6, ease: "power2.out", stagger: 0.05,
-        scrollTrigger: { trigger: ".faq", start: "top 88%", once: true } });
-
-      /* Visor: el bloque sube un poco al entrar */
-      gsap.from("#visor", { y: 40, duration: 0.9, ease: "power3.out",
-        scrollTrigger: { trigger: "#visor", start: "top 90%", once: true } });
+    var root = document.documentElement, scenes = $$(".scene");
+    var REV = { inicio: [".hero-copy > *", "#demo"], "como-funciona": [".sec-head", ".steps li"], pedido: [".sec-head", "#visor"],
+      beneficios: [".sec-head", ".benefits > div"], preguntas: [".sec-head", ".faq details"], contacto: [".contact > *", "footer"] };
+    scenes.forEach(function (sc) {
+      var i = 0; (REV[sc.id] || []).forEach(function (sel) {
+        Array.prototype.forEach.call(sc.querySelectorAll(sel), function (el) { el.classList.add("rv"); el.style.setProperty("--i", i++); });
+      });
     });
-
-
-    /* Las fuentes y las fotos cambian alturas: recalcular los puntos de disparo cuando terminan de cargar */
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { ScrollTrigger.refresh(); });
-    window.addEventListener("load", function () { ScrollTrigger.refresh(); });
+    var dots = $("#dots");
+    scenes.forEach(function (sc) {
+      var a = document.createElement("a"); a.href = "#" + sc.id; a.setAttribute("aria-label", sc.dataset.nombre);
+      a.innerHTML = "<span>" + sc.dataset.nombre + "</span><i></i>"; dots.appendChild(a);
+    });
+    var links = $$("#dots a");
+    root.classList.add("js");
+    if (!("IntersectionObserver" in window)) { scenes.forEach(function (sc) { sc.classList.add("in"); }); }
+    else {
+      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { e.target.classList.toggle("in", e.isIntersecting); }); }, { rootMargin: "-18% 0px -18% 0px" });
+      scenes.forEach(function (sc) { io.observe(sc); });
+    }
+    var prog = $("#prog"), ticking = false, cur = -1, clamp = function (v) { return Math.max(0, Math.min(1, v)); };
+    function update() {
+      ticking = false;
+      var vh = window.innerHeight, max = root.scrollHeight - vh, y = window.pageYOffset;
+      prog.style.setProperty("--prog", max > 0 ? (y / max).toFixed(4) : 0);
+      var act = 0;
+      scenes.forEach(function (sc, i) {
+        var r = sc.getBoundingClientRect();
+        if (r.top <= vh * 0.5) act = i;
+        if (REDUCE || r.bottom < -vh || r.top > vh * 2) return;
+        var tall = r.height > vh * 1.15;
+        sc.style.setProperty("--out", tall ? 0 : clamp(-r.top / (vh * 0.75)).toFixed(3));
+        sc.style.setProperty("--in", tall ? 0 : clamp(r.top / vh).toFixed(3));
+      });
+      if (act !== cur) { cur = act; links.forEach(function (a, i) { a.setAttribute("aria-current", String(i === act)); }); }
+    }
+    function queue() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+    window.addEventListener("scroll", queue, { passive: true }); window.addEventListener("resize", queue); update();
   })();
 })();
 </script>
