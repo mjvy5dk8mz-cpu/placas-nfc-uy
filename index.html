@@ -110,57 +110,72 @@ a { color: inherit; }
   .hero { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 40px; padding-block: 24px 80px; }
 }
 
-/* Animación del celular (un solo look oscuro, colores fijos) */
-.demo { position: relative; height: 540px; border-radius: 26px; overflow: hidden; background: radial-gradient(ellipse at 50% 60%, #232a3a, #0b0d12 70%); color: #ffffff; min-width: 0; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
-.demo-card { position: absolute; left: 50%; bottom: 70px; width: 170px; margin-left: -85px; aspect-ratio: 540 / 855; border-radius: 10px; background: #1b1c27 center / cover no-repeat; box-shadow: 0 30px 50px -20px rgba(0,0,0,.8); }
-.demo-phone { position: absolute; left: 50%; top: 50%; width: 130px; margin-left: -65px; aspect-ratio: 9 / 19; border-radius: 26px; background: #1d222c; border: 3px solid #3a4150; box-shadow: 0 30px 60px -10px rgba(0,0,0,.7); display: grid; place-items: center; z-index: 2; transform: translateY(-125%) rotate(-8deg); opacity: 0; transition: transform 1s cubic-bezier(.2,.8,.2,1), opacity .4s; }
-.demo-phone::before { content: ""; position: absolute; top: 8px; width: 34%; height: 12px; background: #0b0d12; border-radius: 999px; }
-.ph-screen { position: relative; width: 84%; height: 66%; border-radius: 14px; background: linear-gradient(160deg, #2b3242, #161a22); display: grid; place-items: center; text-align: center; font-size: .75rem; padding: 6px; transition: background .4s; }
-.ph-idle { opacity: .8; }
-.ph-review { display: none; color: #11151c; gap: 8px; justify-items: center; }
-.ph-review b { font-size: .8rem; }
-.ph-review span { font-size: .68rem; font-weight: 700; color: #128c4a; opacity: 0; }
-.ph-stars { display: flex; gap: 1px; font-size: 1.05rem; line-height: 1; }
-.ph-stars i { font-style: normal; color: #c9ced8; }
-.demo.s-approach .demo-phone { opacity: 1; transform: translateY(-98%) rotate(-6deg); }
-.demo.s-tap .demo-phone { opacity: 1; transform: translateY(-74%) rotate(0deg); }
-.ripple { position: absolute; left: 50%; top: 30%; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; border: 3px solid #7ea2ff; opacity: 0; pointer-events: none; }
-.demo.s-tap .ripple { animation: rip 1.1s ease-out infinite; }
-.demo.s-tap .ripple:nth-child(2) { animation-delay: .35s; }
-.demo.s-tap .ripple:nth-child(3) { animation-delay: .7s; }
-@keyframes rip { from { transform: scale(.6); opacity: .9; } to { transform: scale(4.2); opacity: 0; } }
-.demo-notif { position: absolute; left: 14px; right: 14px; top: 14px; z-index: 4; max-width: 340px; margin-inline: auto; background: #fafafc; color: #11151c; border-radius: 16px; padding: 10px 12px; display: flex; gap: 10px; align-items: center; box-shadow: 0 16px 40px -10px rgba(0,0,0,.5); transform: translateY(-170%); transition: transform .45s cubic-bezier(.2,.8,.2,1); }
-.demo-notif b { display: block; font-size: .9rem; }
-.demo-notif span { font-size: .8rem; color: #566072; }
-.notif-ico { width: 36px; height: 36px; border-radius: 10px; background: #ffffff; display: grid; place-items: center; box-shadow: inset 0 0 0 1px #e1e4ea; flex: none; }
-.demo.s-notif .demo-notif { transform: none; }
-.demo.s-review .ph-screen { background: #f3f4f7; }
-.demo.s-review .ph-idle { display: none; }
-.demo.s-review .ph-review { display: grid; }
-.demo.s-review .ph-stars i { animation: starOn .3s forwards; }
-.demo.s-review .ph-stars i:nth-child(2) { animation-delay: .25s; }
-.demo.s-review .ph-stars i:nth-child(3) { animation-delay: .5s; }
-.demo.s-review .ph-stars i:nth-child(4) { animation-delay: .75s; }
-.demo.s-review .ph-stars i:nth-child(5) { animation-delay: 1s; }
-.demo.s-review .ph-review span { animation: fadeIn .4s 1.5s forwards; }
-@keyframes starOn { to { color: #f6b704; transform: scale(1.15); } }
-@keyframes fadeIn { to { opacity: 1; } }
-.demo-cap { position: absolute; left: 0; right: 0; bottom: 22px; text-align: center; padding-inline: 16px; font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; }
-@media (prefers-reduced-motion: reduce) {
-  .demo-phone, .demo-notif { transition-duration: .01s; }
-  .demo.s-tap .ripple { animation: none; opacity: .5; transform: scale(2); }
-  .demo.s-review .ph-stars i { animation: none; color: #f6b704; }
-  .demo.s-review .ph-review span { animation: none; opacity: 1; }
-}
+/* Animación del celular: render real del soporte de bambú + celular que se acerca, escanea y deja la reseña */
+.demo { position: relative; width: 100%; aspect-ratio: 4 / 5; max-height: 660px; border-radius: 26px; overflow: hidden; background: #0b0d12; color: #ffffff; min-width: 0; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); isolation: isolate; }
+.demo-blur { position: absolute; inset: -8%; width: 116%; height: 116%; object-fit: cover; filter: blur(26px) brightness(.55); z-index: -1; }
+.scene { position: absolute; left: 50%; top: 0; height: 100%; aspect-ratio: 4 / 5; transform: translateX(-50%); container-type: inline-size; }
+.scene-img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.nfc-pulse { position: absolute; left: 52%; top: 40%; width: 0; height: 0; z-index: 2; }
+.nfc-pulse i { position: absolute; left: 0; top: 0; width: 15cqw; height: 15cqw; margin: -7.5cqw 0 0 -7.5cqw; border-radius: 50%; border: .7cqw solid rgba(31,85,224,.75); box-shadow: 0 0 3cqw rgba(31,85,224,.45); opacity: 0; }
+.demo.s-tap .nfc-pulse i { animation: rip 1.4s ease-out infinite; }
+.demo.s-tap .nfc-pulse i:nth-child(2) { animation-delay: .45s; }
+.demo.s-tap .nfc-pulse i:nth-child(3) { animation-delay: .9s; }
+@keyframes rip { from { transform: scale(.3); opacity: .95; } to { transform: scale(2.6); opacity: 0; } }
 
-/* Galería de renders */
-.sec-head-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; max-width: none; }
-.seg-inline { width: 200px; max-width: 100%; }
-.gal { display: grid; grid-auto-flow: column; grid-auto-columns: 78%; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; }
-.gal figure { margin: 0; position: relative; scroll-snap-align: start; min-width: 0; overflow: hidden; border-radius: var(--radius); background: #120b07; }
-.gal img { display: block; width: 100%; height: auto; border-radius: var(--radius); background: #120b07; }
-.gal figcaption { position: absolute; left: 12px; bottom: 12px; background: rgba(11,13,18,.72); color: #ffffff; padding: 4px 12px; border-radius: 999px; font-size: .85rem; font-weight: 700; }
-@media (min-width: 700px) { .gal { grid-auto-flow: row; grid-template-columns: repeat(3, 1fr); overflow: visible; padding-bottom: 0; } }
+/* Celular: se dibuja con CSS (marco de titanio, isla, pantalla de vidrio). El texto interno escala con su ancho (cqw). */
+.phone { position: absolute; left: 50%; top: 3%; width: 31%; aspect-ratio: 9 / 18.6; z-index: 3; container-type: inline-size;
+  transform: translate(60%, -135%) rotate(26deg); opacity: 0; filter: drop-shadow(0 18px 16px rgba(0,0,0,.5));
+  transition: transform 1.1s cubic-bezier(.3,.7,.2,1), opacity .5s; will-change: transform; }
+.phone-body { position: absolute; inset: 0; border-radius: 15cqw; padding: 1.5cqw; background: linear-gradient(140deg, #b9bbc0 0%, #55585d 28%, #2b2d31 50%, #6e7176 74%, #c4c6ca 100%); box-shadow: inset 0 0 0 .4cqw rgba(255,255,255,.35); }
+.phone-bezel { position: relative; width: 100%; height: 100%; border-radius: 13.6cqw; padding: 2cqw; background: #050506; }
+.screen { position: relative; width: 100%; height: 100%; border-radius: 11.6cqw; overflow: hidden; background: #0b0d12; }
+.screen::after { content: ""; position: absolute; inset: 0; z-index: 9; pointer-events: none; background: linear-gradient(118deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,.04) 28%, transparent 42%); }
+.side { position: absolute; width: 1.4cqw; border-radius: 1cqw; background: linear-gradient(90deg, #44474c, #8c8f95); }
+.side.s1 { left: -.9cqw; top: 22cqw; height: 9cqw; } .side.s2 { left: -.9cqw; top: 36cqw; height: 15cqw; } .side.s3 { left: -.9cqw; top: 54cqw; height: 15cqw; } .side.s4 { right: -.9cqw; top: 44cqw; height: 24cqw; }
+.island { position: absolute; z-index: 8; top: 3.2cqw; left: 50%; width: 27cqw; height: 7.8cqw; margin-left: -13.5cqw; border-radius: 99px; background: #000; }
+.sbar { position: absolute; z-index: 8; top: 3.4cqw; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 8cqw; font-size: 4.3cqw; font-weight: 700; line-height: 7.4cqw; color: #fff; }
+.sbar b { font-weight: 700; } .batt { display: inline-block; width: 7cqw; height: 3.4cqw; margin-top: 2cqw; border-radius: 1.2cqw; background: #fff; vertical-align: top; }
+.home { position: absolute; z-index: 8; bottom: 2cqw; left: 50%; width: 32cqw; height: 1.3cqw; margin-left: -16cqw; border-radius: 9px; background: rgba(255,255,255,.75); }
+.scr { position: absolute; inset: 0; transition: opacity .5s; }
+.scr-lock { background: radial-gradient(120% 70% at 30% 0%, #6d8ee0 0%, transparent 60%), linear-gradient(170deg, #35479a 0%, #222a66 50%, #14173a 100%); }
+.lock-date { position: absolute; top: 16cqw; left: 0; right: 0; text-align: center; font-size: 4.6cqw; font-weight: 500; opacity: .85; }
+.lock-time { position: absolute; top: 20cqw; left: 0; right: 0; text-align: center; font-size: 21cqw; font-weight: 500; line-height: 1; letter-spacing: -.02em; }
+.notif { position: absolute; left: 4cqw; right: 4cqw; top: 78cqw; display: flex; gap: 3cqw; align-items: center; padding: 3cqw; border-radius: 6cqw; background: rgba(250,250,252,.94); color: #11151c; box-shadow: 0 2cqw 6cqw rgba(0,0,0,.35); transform: translateY(-14cqw) scale(.96); opacity: 0; transition: transform .45s cubic-bezier(.2,.8,.2,1), opacity .3s; }
+.notif .ico { flex: none; width: 11cqw; height: 11cqw; border-radius: 3cqw; background: #fff; display: grid; place-items: center; box-shadow: inset 0 0 0 .3cqw #e1e4ea; }
+.notif .ico svg { width: 6.6cqw; height: 6.6cqw; }
+.notif b { display: block; font-size: 4.4cqw; line-height: 1.15; } .notif span { display: block; font-size: 3.5cqw; color: #566072; line-height: 1.2; }
+.demo.s-notif .notif { transform: none; opacity: 1; }
+.demo.s-notif .phone { animation: buzz .35s 1; }
+@keyframes buzz { 0%,100% { margin-left: 0; } 25% { margin-left: -.6cqw; } 75% { margin-left: .6cqw; } }
+.scr-review { background: #fff; color: #1f2024; opacity: 0; padding: 13cqw 5cqw 0; }
+.demo.s-review .scr-review { opacity: 1; } .demo.s-review .scr-lock { opacity: 0; }
+.rv-top { display: flex; align-items: center; gap: 2.4cqw; font-size: 3.9cqw; font-weight: 700; color: #3c4043; padding-bottom: 3cqw; border-bottom: .3cqw solid #e6e8ec; }
+.rv-top svg { width: 6cqw; height: 6cqw; }
+.rv-place { margin-top: 4cqw; } .rv-place b { display: block; font-size: 6cqw; line-height: 1.15; } .rv-place small { font-size: 3.6cqw; color: #70757a; }
+.rv-stars { display: flex; justify-content: center; gap: 1cqw; margin-top: 5cqw; font-size: 13cqw; line-height: 1; }
+.rv-stars i { font-style: normal; color: #d3d6dc; }
+.demo.s-review .rv-stars i { animation: starOn .3s forwards; }
+.demo.s-review .rv-stars i:nth-child(2) { animation-delay: .25s; } .demo.s-review .rv-stars i:nth-child(3) { animation-delay: .5s; } .demo.s-review .rv-stars i:nth-child(4) { animation-delay: .75s; } .demo.s-review .rv-stars i:nth-child(5) { animation-delay: 1s; }
+@keyframes starOn { to { color: #fbbc04; transform: scale(1.12); } }
+.rv-text { margin-top: 5cqw; padding: 3cqw; border: .4cqw solid #dadce0; border-radius: 3cqw; display: grid; gap: 2cqw; min-height: 22cqw; align-content: start; }
+.rv-text span { display: block; height: 2.2cqw; border-radius: 2cqw; background: #e3e5e9; width: 0; }
+.demo.s-review .rv-text span { animation: line .5s 1.5s forwards; } .demo.s-review .rv-text span:nth-child(2) { animation-delay: 1.75s; } .demo.s-review .rv-text span:nth-child(3) { animation-delay: 2s; }
+@keyframes line { to { width: 100%; } } .demo.s-review .rv-text span.short { animation-name: lineShort; } @keyframes lineShort { to { width: 55%; } }
+.rv-btn { margin-top: 5cqw; text-align: center; padding: 3cqw; border-radius: 99px; background: #1a73e8; color: #fff; font-size: 4.2cqw; font-weight: 700; }
+.demo.s-done .rv-btn { background: #188038; }
+.rv-done { position: absolute; left: 5cqw; right: 5cqw; bottom: 12cqw; padding: 3cqw; border-radius: 4cqw; background: #e6f4ea; color: #188038; font-size: 4.4cqw; font-weight: 700; text-align: center; opacity: 0; transform: translateY(4cqw); transition: opacity .4s, transform .4s; }
+.demo.s-done .rv-done { opacity: 1; transform: none; }
+/* escena: el celular entra desde arriba, baja sobre la placa, y sube al terminar */
+.demo.s-approach .phone { opacity: 1; transform: translate(20%, -8%) rotate(18deg); transition-duration: 1.5s; }
+.demo.s-tap .phone { opacity: 1; transform: translate(12%, 8%) rotate(8deg); transition-duration: .8s; }
+.demo.s-leave .phone { opacity: 0; transform: translate(40%, -125%) rotate(22deg); transition-duration: 1.1s; }
+.demo-cap { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); width: max-content; max-width: calc(100% - 28px); text-align: center; padding: 8px 16px; border-radius: 999px; background: rgba(11,13,18,.74); font-family: var(--font-display); font-weight: 600; font-size: 1rem; z-index: 5; }
+@media (prefers-reduced-motion: reduce) {
+  .phone, .notif, .scr { transition-duration: .01s; }
+  .demo.s-tap .nfc-pulse i { animation: none; opacity: .5; transform: scale(1.6); }
+  .demo.s-review .rv-stars i { animation: none; color: #fbbc04; }
+  .demo.s-review .rv-text span { animation: none; width: 100%; } .demo.s-review .rv-text span.short { width: 55%; }
+}
 
 /* Carrito */
 .cart { display: grid; gap: 8px; }
@@ -278,7 +293,6 @@ footer { padding-block: 28px 96px; color: var(--muted); font-size: 0.85rem; bord
   <a class="brand" href="#inicio"><i></i><span data-marca>Placas NFC</span></a>
   <nav class="nav" aria-label="Secciones">
     <a href="#como-funciona">Cómo funciona</a>
-    <a href="#galeria">Cómo queda</a>
     <a href="#pedido">Armá tu pedido</a>
     <a href="#preguntas">Preguntas</a>
   </nav>
@@ -305,16 +319,30 @@ footer { padding-block: 28px 96px; color: var(--muted); font-size: 0.85rem; bord
       </ul>
     </div>
 
-    <div class="demo" id="demo" role="img" aria-label="Animación: el cliente acerca el celular a la placa, le salta un aviso y deja su reseña de 5 estrellas.">
-      <div class="demo-notif" aria-hidden="true">
-        <div class="notif-ico"><svg width="22" height="22" viewBox="0 0 48 48" id="notif-g"></svg></div>
-        <div><b>Dejá tu reseña</b><span>Tocá para abrir en Google Maps</span></div>
-      </div>
-      <div class="demo-card" id="demo-card" aria-hidden="true"><span class="ripple"></span><span class="ripple"></span><span class="ripple"></span></div>
-      <div class="demo-phone" aria-hidden="true">
-        <div class="ph-screen">
-          <span class="ph-idle">Celular del cliente</span>
-          <div class="ph-review"><b>¿Cómo te fue?</b><div class="ph-stars"><i>★</i><i>★</i><i>★</i><i>★</i><i>★</i></div><span>¡Reseña publicada!</span></div>
+    <div class="demo" id="demo" role="img" aria-label="Animación: un celular se acerca a la placa de bambú, la escanea, le salta un aviso y deja la reseña de 5 estrellas.">
+      <img class="demo-blur" src="img/taco_bambu_negra_34.jpg" alt="" aria-hidden="true">
+      <div class="scene" aria-hidden="true">
+        <img class="scene-img" src="img/taco_bambu_negra_34.jpg" alt="" width="1080" height="1350" fetchpriority="high">
+        <span class="nfc-pulse"><i></i><i></i><i></i></span>
+        <div class="phone" id="phone">
+          <span class="side s1"></span><span class="side s2"></span><span class="side s3"></span><span class="side s4"></span>
+          <div class="phone-body"><div class="phone-bezel"><div class="screen">
+            <span class="island"></span>
+            <div class="sbar"><b>9:41</b><span class="batt"></span></div>
+            <div class="scr scr-lock">
+              <div class="lock-date">jueves 19 de noviembre</div><div class="lock-time">9:41</div>
+              <div class="notif"><span class="ico"><svg viewBox="0 0 48 48" id="notif-g"></svg></span><div><b>Dejá tu reseña</b><span>Tocá para abrir en Google Maps</span></div></div>
+            </div>
+            <div class="scr scr-review">
+              <div class="rv-top"><svg viewBox="0 0 48 48" id="review-g"></svg><span>Reseñas</span></div>
+              <div class="rv-place"><b>Tu local</b><small>Montevideo</small></div>
+              <div class="rv-stars"><i>★</i><i>★</i><i>★</i><i>★</i><i>★</i></div>
+              <div class="rv-text"><span></span><span></span><span class="short"></span></div>
+              <div class="rv-btn">Publicar</div>
+              <div class="rv-done">✓ ¡Reseña publicada!</div>
+            </div>
+            <span class="home"></span>
+          </div></div></div>
         </div>
       </div>
       <p class="demo-cap" id="demo-cap" aria-hidden="true">El cliente acerca el celular</p>
@@ -331,26 +359,6 @@ footer { padding-block: 28px 96px; color: var(--muted); font-size: 0.85rem; bord
         <li><div><h3>Las ponés a la vista</h3><p>En el mostrador, la caja o cada mesa. El soporte las deja paradas y mirando al cliente.</p></div></li>
         <li><div><h3>El cliente acerca el celular</h3><p>Se le abre la pantalla para puntuarte y escribir. Le lleva menos de un minuto mientras espera la cuenta.</p></div></li>
       </ol>
-    </div>
-  </section>
-
-  <section id="galeria">
-    <div class="wrap">
-      <div class="sec-head">
-        <h2>Así queda en tu local</h2>
-        <p>Tres soportes de madera maciza a elección: bambú, pino o madera quemada.</p>
-      </div>
-      <div class="gal" id="gal" tabindex="0" aria-label="Fotos de la placa en los soportes de bambú, pino y madera quemada">
-        <figure><img src="img/taco_bambu_negra_34.jpg" alt="Tarjeta NFC negra parada en el soporte de bambú, un taco macizo con una ranura fina" width="1080" height="1350" loading="lazy"><figcaption>Bambú</figcaption></figure>
-        <figure><img src="img/taco_pino_negra_34.jpg" alt="Tarjeta NFC negra parada en el soporte de pino, un taco macizo con una ranura fina" width="1080" height="1350" loading="lazy"><figcaption>Pino</figcaption></figure>
-        <figure><img src="img/taco_bambu_blanca_34.jpg" alt="Tarjeta NFC blanca parada en el soporte de bambú" width="1080" height="1350" loading="lazy"><figcaption>Bambú con tarjeta blanca</figcaption></figure>
-        <figure><img src="img/taco_pino_blanca_34.jpg" alt="Tarjeta NFC blanca parada en el soporte de pino" width="1080" height="1350" loading="lazy"><figcaption>Pino con tarjeta blanca</figcaption></figure>
-        <figure><img src="img/taco_bambu_negra_perfil.jpg" alt="Soporte de bambú de perfil: la tarjeta entra apenas en la ranura, inclinada 10 grados hacia atrás" width="1080" height="1350" loading="lazy"><figcaption>Bambú de perfil</figcaption></figure>
-        <figure><img src="img/taco_pino_negra_perfil.jpg" alt="Soporte de pino de perfil: la tarjeta entra apenas en la ranura, inclinada 10 grados hacia atrás" width="1080" height="1350" loading="lazy"><figcaption>Pino de perfil</figcaption></figure>
-        <figure><img src="img/taco_quemado_negra_34.jpg" alt="Tarjeta NFC negra parada en el soporte de madera quemada, negro carbón con la veta marcada" width="1080" height="1350" loading="lazy"><figcaption>Madera quemada</figcaption></figure>
-        <figure><img src="img/taco_quemado_blanca_34.jpg" alt="Tarjeta NFC blanca parada en el soporte de madera quemada" width="1080" height="1350" loading="lazy"><figcaption>Quemada con tarjeta blanca</figcaption></figure>
-        <figure><img src="img/taco_quemado_negra_perfil.jpg" alt="Soporte de madera quemada de perfil: la tarjeta entra apenas en la ranura, inclinada 10 grados hacia atrás" width="1080" height="1350" loading="lazy"><figcaption>Quemada de perfil</figcaption></figure>
-      </div>
     </div>
   </section>
 
@@ -472,7 +480,6 @@ footer { padding-block: 28px 96px; color: var(--muted); font-size: 0.85rem; bord
   <div class="wrap">
     <nav class="foot-nav" aria-label="Pie de página">
       <a href="#como-funciona">Cómo funciona</a>
-      <a href="#galeria">Cómo queda</a>
       <a href="#pedido">Armá tu pedido</a>
       <a href="#preguntas">Preguntas</a>
       <a data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener">WhatsApp</a>
@@ -688,25 +695,24 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
   /* ---------------- Animación del celular ---------------- */
   (function () {
     var demo = $("#demo"), cap = $("#demo-cap"), timers = [], running = false;
-    $("#notif-g").innerHTML = G_PATHS.map(function (p) { return '<path fill="' + p[0] + '" d="' + p[1] + '"/>'; }).join("");
-    function paintCard() { try { $("#demo-card").style.backgroundImage = "url(" + drawCard("negra").toDataURL("image/png") + ")"; } catch (e) {} }
-    paintCard();
-    if (document.fonts && document.fonts.load) document.fonts.load('500 80px "DM Sans"').then(paintCard).catch(function () {});
+    var gsvg = G_PATHS.map(function (p) { return '<path fill="' + p[0] + '" d="' + p[1] + '"/>'; }).join("");
+    $("#notif-g").innerHTML = gsvg; $("#review-g").innerHTML = gsvg;
     var STEPS = [
       [0, "s-approach", "El cliente acerca el celular"],
-      [1400, "s-tap", "La placa lo detecta al instante"],
-      [2600, "s-tap s-notif", "Le salta el aviso, sin bajar ninguna app"],
-      [4200, "s-tap s-review", "Y te deja la reseña en Google"],
-      [7600, "", "El cliente acerca el celular"]
+      [1700, "s-tap", "La placa lo detecta al instante"],
+      [2900, "s-tap s-notif", "Le salta el aviso, sin bajar ninguna app"],
+      [4300, "s-tap s-review", "Elige las estrellas y escribe"],
+      [7600, "s-tap s-review s-done", "Y te deja la reseña en Google"],
+      [9600, "s-leave", "El cliente acerca el celular"]
     ];
     function stop() { timers.forEach(clearTimeout); timers = []; running = false; }
     function play() {
       stop(); running = true;
       STEPS.forEach(function (st) { timers.push(setTimeout(function () { demo.className = "demo " + st[1]; cap.textContent = st[2]; }, st[0] + 300)); });
-      timers.push(setTimeout(play, 8500));
+      timers.push(setTimeout(play, 11200));
     }
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      demo.className = "demo s-tap s-notif"; cap.textContent = "El cliente acerca el celular y le salta el aviso"; return;
+      demo.className = "demo s-tap s-review s-done"; cap.textContent = "El cliente acerca el celular y te deja la reseña"; return;
     }
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(function (e) { if (e[0].isIntersecting) { if (!running) play(); } else stop(); }).observe(demo);
@@ -1170,14 +1176,6 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
         scrollTrigger: { trigger: "#visor", start: "top 90%", once: true } });
     });
 
-    /* Galería en escritorio: parallax de las fotos dentro de su marco, atado al scroll */
-    mm.add("(prefers-reduced-motion: no-preference) and (min-width: 700px)", function () {
-      gsap.utils.toArray("#gal figure").forEach(function (fig, i) {
-        var img = fig.querySelector("img");
-        gsap.fromTo(img, { yPercent: -7, scale: 1.16 }, { yPercent: 7, scale: 1.16, ease: "none",
-          scrollTrigger: { trigger: fig, start: "top bottom", end: "bottom top", scrub: 0.6 + i * 0.25 } });
-      });
-    });
 
     /* Las fuentes y las fotos cambian alturas: recalcular los puntos de disparo cuando terminan de cargar */
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { ScrollTrigger.refresh(); });
