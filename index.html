@@ -389,6 +389,24 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
 /* al tocar Bambú / Pino / Quemada se salta directo, con un fundido rápido */
 .m-pin.jump .m-slide { animation: mjump .45s cubic-bezier(.2,.8,.2,1); }
 @keyframes mjump { from { opacity: .2; transform: scale(1.06); } to { opacity: 1; transform: none; } }
+
+/* Pasos sin foto */
+.steps li { padding: 22px 22px 24px; gap: 14px; align-content: start; }
+.steps li::before { position: static; }
+.steps li > div { padding: 0; }
+@media (min-width: 800px) { .steps li { padding: 28px 28px 32px; } }
+
+/* Redes */
+.social { display: flex; gap: 10px; }
+.social a { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); transition: transform .2s cubic-bezier(.2,1.4,.4,1), background-color .2s, color .2s; }
+.social a:hover { transform: translateY(-3px) scale(1.06); background: var(--ink); color: var(--bg); }
+.social svg { width: 22px; height: 22px; }
+.foot-social { margin-bottom: 14px; }
+.foot-social .social a { width: 40px; height: 40px; }
+.foot-social .social svg { width: 19px; height: 19px; }
+
+.contact-row { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; }
+.contact .num { font-size: clamp(1.3rem, 4vw, 1.8rem); user-select: all; }
 </style>
 
 </head>
@@ -481,9 +499,9 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
     <div class="wrap">
       <div class="sec-head"><h2 class="words">Tres pasos y ya estás juntando reseñas</h2></div>
       <ol class="steps">
-        <li class="pop"><img src="img/taco_quemado_blanca_34.jpg" alt="" width="1080" height="1350" loading="lazy"><div><h3>Nos pasás tu local</h3><p>Nos mandás el nombre o el link de tu negocio en Google Maps y programamos las tarjetas con tu página de reseñas.</p></div></li>
-        <li class="pop"><img src="img/taco_pino_blanca_34.jpg" alt="" width="1080" height="1350" loading="lazy"><div><h3>Las ponés a la vista</h3><p>En el mostrador, la caja o cada mesa. El soporte las deja paradas y mirando al cliente.</p></div></li>
-        <li class="pop"><img src="img/taco_bambu_negra_perfil.jpg" alt="" width="1080" height="1350" loading="lazy"><div><h3>El cliente acerca el celular</h3><p>Se le abre la pantalla para puntuarte y escribir. Le lleva menos de un minuto mientras espera la cuenta.</p></div></li>
+        <li class="pop"><div><h3>Nos pasás tu local</h3><p>Nos mandás el nombre o el link de tu negocio en Google Maps y programamos las tarjetas con tu página de reseñas.</p></div></li>
+        <li class="pop"><div><h3>Las ponés a la vista</h3><p>En el mostrador, la caja o cada mesa. El soporte las deja paradas y mirando al cliente.</p></div></li>
+        <li class="pop"><div><h3>El cliente acerca el celular</h3><p>Se le abre la pantalla para puntuarte y escribir. Le lleva menos de un minuto mientras espera la cuenta.</p></div></li>
       </ol>
     </div>
   </section>
@@ -601,6 +619,7 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
       <div class="contact-row fly">
         <a class="btn btn-wa" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.200-1.200l-.3-.2-3 .8.8-2.900-.2-.3A8.200 8.200 0 1 1 12 20.200zm4.500-6.100c-.200-.100-1.500-.700-1.700-.800-.200-.100-.400-.100-.600.100l-.800 1c-.100.200-.300.200-.500.100a6.700 6.700 0 0 1-3.300-2.900c-.200-.400.200-.400.700-1.300.100-.200 0-.300 0-.500l-.800-1.900c-.200-.500-.400-.400-.600-.400h-.500c-.200 0-.500.100-.700.300-.900.900-1 2.100-.300 3.400a11 11 0 0 0 4.600 4.300c1.700.700 2.400.800 3.200.700.500-.100 1.500-.600 1.700-1.200.200-.600.200-1.100.100-1.200-.100-.100-.200-.200-.500-.300z"/></svg> Abrir WhatsApp</a>
         <span class="num" data-wa-num>095 833 281</span>
+        <div class="social"><a data-red="instagram" href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a><a data-red="tiktok" href="https://www.tiktok.com/" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 2h-3.4v13.3a2.9 2.9 0 1 1-2.1-2.8V9a6.3 6.3 0 1 0 5.5 6.3V8.6a7.8 7.8 0 0 0 4.4 1.4V6.6a4.4 4.4 0 0 1-4.4-4.4z"/></svg></a></div>
       </div>
     </div>
     <footer>
@@ -611,6 +630,7 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
           <a href="#preguntas">Preguntas</a>
           <a data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener">WhatsApp</a>
         </nav>
+        <div class="foot-social"><div class="social"><a data-red="instagram" href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a><a data-red="tiktok" href="https://www.tiktok.com/" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 2h-3.4v13.3a2.9 2.9 0 1 1-2.1-2.8V9a6.3 6.3 0 1 0 5.5 6.3V8.6a7.8 7.8 0 0 0 4.4 1.4V6.6a4.4 4.4 0 0 1-4.4-4.4z"/></svg></a></div></div>
         <p><span data-marca>Placas NFC</span> · Montevideo, Uruguay. Google y el logo de Google son marcas de Google LLC; este sitio no está afiliado a Google.</p>
       </div>
     </footer>
@@ -635,6 +655,8 @@ var CONFIG = {
   whatsapp: "59895833281",          // Tu número con código de país, sin + ni espacios
   whatsappVisible: "095 833 281",   // Cómo se muestra en la sección de contacto
   marca: "Placas NFC",              // Nombre que aparece arriba y en el pie
+  instagram: "",                    // Usuario de Instagram sin @ (vacío = lleva a instagram.com). TODO: completar
+  tiktok: "",                       // Usuario de TikTok sin @ (vacío = lleva a tiktok.com). TODO: completar
   precios: { 1: 650, 2: 1200, 3: 1700, 4: 2150, 5: 2500 },   // Precio total según cantidad (siempre con soportes)
   precioExtra: 450,                 // Cada tarjeta con soporte de la 6 a la 10
   precioExtra10: 400,               // Cada tarjeta con soporte desde la 11 en adelante
@@ -665,6 +687,7 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
   document.documentElement.lang = "es-UY";
 
   $$("[data-marca]").forEach(function (e) { e.textContent = CONFIG.marca; });
+  $$("[data-red]").forEach(function (a) { var u = (CONFIG[a.dataset.red] || "").replace(/^@/, ""); if (u) a.href = a.dataset.red === "instagram" ? "https://www.instagram.com/" + u + "/" : "https://www.tiktok.com/@" + u; });
   $$("[data-wa-num]").forEach(function (e) { e.textContent = CONFIG.whatsappVisible; });
   $$("[data-extra]").forEach(function (e) { e.textContent = pesos(CONFIG.extraLogo); });
   $("#faq-precios").textContent = "Todas vienen con su soporte. Una tarjeta con soporte sale " + pesos(CONFIG.precios[1]) + ", dos " + pesos(CONFIG.precios[2]) + ", tres " + pesos(CONFIG.precios[3])
