@@ -457,6 +457,13 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
   .float-bar { transition: transform .35s cubic-bezier(.2,.9,.3,1.2), opacity .25s; }
   .js .float-bar:not(.shown) { transform: translateY(140%); opacity: 0; pointer-events: none; }
 }
+@media (max-width: 899px) {
+  .sec.portada { padding: 0; }                       /* sin hueco negro abajo de los botones */
+  .topbar { background: var(--bg); }                  /* barra opaca: no se transparenta el cartel del video */
+  .portada-copy { padding-bottom: 24px; }
+}
+.lead, .sec-head p, .steps p, .benefits p { text-wrap: pretty; }
+@media (max-width: 899px) { .sec.portada { padding-top: calc(58px + env(safe-area-inset-top, 0px)); } }
 </style>
 
 </head>
