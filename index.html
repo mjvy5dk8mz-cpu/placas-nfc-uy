@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Web de placas NFC</title>
-<!-- v3: soporte de bambú + grabado láser animado -->
+<!-- v4: portada con celular + modelos con zoom -->
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="theme-color" content="#11151c">
+<meta name="theme-color" content="#0a0a09">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Placas NFC para reseñas de Google">
 <meta property="og:description" content="Tus clientes acercan el celular y te dejan la reseña. Tarjetas con soporte para mostrador, entregadas programadas en Uruguay.">
@@ -14,102 +14,101 @@
 <meta name="description" content="Placas NFC para que tus clientes dejen una reseña en Google acercando el celular. Tarjetas con soporte para mostrador, entregadas programadas en Uruguay.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Sans:opsz,wght@9..40,400..700&display=swap">
 <style>
-/* Layout: una página de escenas a pantalla completa (scroll-snap suave). Cada escena entra con sus elementos en cascada y sale atenuándose; el visor 3D y el celular escaneando viven dentro de sus escenas. */
+/* Estilo "ficha técnica": fondo negro, titulares enormes en mayúscula condensada, etiquetas entre corchetes en monoespaciada
+   y lecturas tipo instrumento. Un solo tema oscuro; el acento es color brasa (el del grabado láser). */
 :root {
-  --bg: #eef0f4;
-  --surface: #ffffff;
-  --ink: #11151c;
-  --muted: #566072;
-  --line: #d3d9e3;
-  --accent: #1f55e0;
-  --accent-ink: #ffffff;
+  --bg: #0a0a09;
+  --surface: #131311;
+  --surface-2: #1b1b18;
+  --ink: #ecebe6;
+  --muted: #8f8d85;
+  --line: #2b2a26;
+  --accent: #ff6a2a;
+  --accent-ink: #160700;
   --star: #f6b704;
-  --wa: #128c4a;
-  --wa-ink: #ffffff;
-  --font-display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
-  --font-body: "DM Sans", "Segoe UI", system-ui, sans-serif;
-  --radius: 18px;
-  color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0d1016; --surface: #171b23;
-    --ink: #eef1f6; --muted: #9ba6b8; --line: #2a313d;
-    --accent: #7ea2ff; --accent-ink: #0a1230; --wa: #2fc56f; --wa-ink: #04220f;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #0d1016; --surface: #171b23;
-  --ink: #eef1f6; --muted: #9ba6b8; --line: #2a313d;
-  --accent: #7ea2ff; --accent-ink: #0a1230; --wa: #2fc56f; --wa-ink: #04220f;
+  --wa: #25d366;
+  --wa-ink: #03210f;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Archivo", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radius: 4px;
   color-scheme: dark;
 }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme: dark; } }
+:root[data-theme="dark"] { color-scheme: dark; }
 
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; background: var(--bg); }
 body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: 17px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; overflow-x: clip;
 }
-.wrap {
-  max-width: 1120px;
-  margin-inline: auto;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-}
-h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; line-height: 1.05; }
-h1 { font-size: clamp(2.3rem, 7.2vw, 4.1rem); font-weight: 800; letter-spacing: -0.02em; }
-h2 { font-size: clamp(1.7rem, 4.6vw, 2.5rem); font-weight: 800; letter-spacing: -0.015em; }
-h3 { font-size: 1.2rem; font-weight: 600; line-height: 1.2; }
+/* grano de película, fijo y sin costo de animación */
+body::after { content: ""; position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: .07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.wrap { max-width: 1240px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+.disp, h1, h2 { font-stretch: 62%; font-variation-settings: "wdth" 62; font-weight: 800; text-transform: uppercase; letter-spacing: -.01em; line-height: .88; }
+h1 { font-size: clamp(3.3rem, 13.5vw, 7.4rem); }
+h2 { font-size: clamp(2.6rem, 9vw, 5.6rem); }
+h3 { font-size: 1.15rem; font-weight: 700; line-height: 1.2; }
+h1 em, h2 em { font-style: normal; color: var(--accent); }
 p { margin: 0; }
 a { color: inherit; }
-:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.tag, .eyebrow { font-family: var(--font-mono); font-size: .74rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.tag::before, .eyebrow::before { content: "[ "; color: var(--accent); }
+.tag::after, .eyebrow::after { content: " ]"; color: var(--accent); }
+.mono { font-family: var(--font-mono); }
 
 /* Header */
-.head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px; }
-.brand { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; text-decoration: none; display: flex; align-items: center; gap: 8px; }
-.brand i { width: 12px; height: 12px; border-radius: 50%; background: var(--star); display: inline-block; }
-.nav { display: flex; gap: 20px; font-size: 0.95rem; }
-.nav a { text-decoration: none; color: var(--muted); font-weight: 500; }
+.topbar { position: fixed; z-index: 30; top: 0; left: 0; right: 0; padding-top: env(safe-area-inset-top, 0px); background: rgba(10,10,9,.72); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+.prog { position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: var(--accent); transform-origin: 0 50%; transform: scaleX(var(--prog, 0)); }
+.head { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 58px; }
+.brand { font-family: var(--font-mono); font-weight: 500; font-size: .86rem; letter-spacing: .04em; text-transform: uppercase; text-decoration: none; display: flex; align-items: center; gap: 9px; }
+.brand i { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); display: inline-block; }
+.nav { display: flex; gap: 26px; font-family: var(--font-mono); font-size: .76rem; text-transform: uppercase; letter-spacing: .05em; }
+.nav a { text-decoration: none; color: var(--muted); }
 .nav a:hover { color: var(--ink); }
-@media (max-width: 720px) { .nav { display: none; } }
+@media (max-width: 860px) { .nav { display: none; } }
 
 /* Botones */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 9px;
-  font: inherit; font-weight: 700; text-decoration: none; cursor: pointer;
-  border: 0; border-radius: 999px; padding: 14px 22px; min-height: 50px;
-  transition: transform .15s ease;
+  font-family: var(--font-mono); font-size: .86rem; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; text-decoration: none; cursor: pointer;
+  border: 0; border-radius: var(--radius); padding: 14px 22px; min-height: 50px;
+  transition: transform .15s ease, background-color .2s, color .2s;
 }
 .btn:hover { transform: translateY(-1px); }
 .btn-wa { background: var(--wa); color: var(--wa-ink); }
-.btn-primary { background: var(--ink); color: var(--bg); }
-.btn-ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line); }
-.btn-sm { padding: 9px 16px; min-height: 40px; font-size: 0.92rem; }
-.btn svg { width: 20px; height: 20px; flex: none; }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.btn-ghost:hover { box-shadow: inset 0 0 0 1px var(--ink); }
+.btn-sm { padding: 8px 14px; min-height: 40px; font-size: .74rem; }
+.btn svg { width: 18px; height: 18px; flex: none; }
+
+/* Secciones */
+.sec { position: relative; padding-block: clamp(70px, 9vw, 110px); border-top: 1px solid var(--line); }
+.sec-head { display: grid; gap: 16px; margin-bottom: clamp(30px, 5vw, 56px); }
+.sec-head p { color: var(--muted); max-width: 36em; font-size: 1.05rem; }
+[id] { scroll-margin-top: 58px; }
 
 /* Hero */
-.hero { display: grid; gap: 22px; align-items: center; }
-.hero-copy { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
-.eyebrow { font-size: 0.78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.eyebrow::before { content: "★★★★★"; color: var(--star); letter-spacing: 2px; margin-right: 10px; }
-.lead { font-size: 1.15rem; color: var(--muted); max-width: 34em; }
+.scene-hero { min-height: 100svh; display: flex; align-items: center; padding: calc(78px + env(safe-area-inset-top, 0px)) 0 34px; border-top: 0; }
+.hero { display: grid; gap: 26px; align-items: center; width: 100%; }
+.hero-copy { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.lead { font-size: 1.1rem; color: var(--muted); max-width: 32em; }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; }
-.ticks { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--muted); font-size: 0.95rem; }
-.ticks li::before { content: "✓"; color: var(--wa); font-weight: 700; margin-right: 6px; }
-@media (min-width: 900px) {
-  .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
-}
-@media (max-width: 899px) { .demo { height: min(46svh, 420px); } .hero-copy { gap: 14px; } .ticks { display: none; } }
+@media (min-width: 960px) { .hero { grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 48px; } }
+@media (max-width: 959px) { .demo { height: min(58svh, 520px); } .hero-copy { gap: 16px; } }
+.readouts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin-top: 34px; }
+.readouts > div { padding: 14px 14px 16px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: grid; gap: 4px; min-width: 0; }
+.readouts b { font-family: var(--font-display); font-stretch: 62%; font-variation-settings: "wdth" 62; font-weight: 800; font-size: clamp(1.9rem, 5vw, 2.6rem); line-height: 1; text-transform: uppercase; }
+@media (min-width: 760px) { .readouts { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
 /* Animación del celular: render real del soporte de bambú + celular que se acerca, escanea y deja la reseña */
 .demo { position: relative; height: min(66svh, 620px); max-width: 100%; justify-self: center; aspect-ratio: 4 / 5; border-radius: 26px; overflow: hidden; background: #0b0d12; color: #ffffff; min-width: 0; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); isolation: isolate; }
@@ -178,140 +177,219 @@ a { color: inherit; }
   .demo.s-review .rv-text span { animation: none; width: 100%; } .demo.s-review .rv-text span.short { width: 55%; }
 }
 
-/* Carrito */
-.cart { display: grid; gap: 8px; }
-.cart-row { display: flex; align-items: center; gap: 12px; background: var(--bg); border-radius: 14px; padding: 8px 8px 8px 14px; }
-.cart-name { flex: 1; min-width: 0; font-weight: 500; }
-.chip { width: 22px; height: 34px; border-radius: 4px; flex: none; box-shadow: inset 0 0 0 1.5px var(--line); }
-.chip-negra { background: #1b1c27; }
-.chip-blanca { background: #f6f6f3; }
-.qty { display: flex; align-items: center; gap: 4px; }
-.qty button { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--surface); color: var(--ink); font: inherit; font-size: 1.4rem; line-height: 1; cursor: pointer; box-shadow: inset 0 0 0 1.5px var(--line); }
-.qty button:disabled { opacity: .35; cursor: default; }
-.qty output { min-width: 2.2em; text-align: center; font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
-.btn[aria-disabled="true"] { opacity: .45; pointer-events: none; cursor: default; }
-@media (min-width: 900px) {
-  .viewer { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
-  .viewer .stage { aspect-ratio: auto; max-height: none; min-height: 560px; height: 100%; }
-}
+.demo { border-radius: var(--radius); box-shadow: inset 0 0 0 1px var(--line); }
+.demo-cap { border-radius: var(--radius); font-family: var(--font-mono); font-weight: 500; font-size: .76rem; letter-spacing: .03em; text-transform: uppercase; background: rgba(10,10,9,.8); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
+.nfc-pulse i { border-color: rgba(255,106,42,.85); box-shadow: 0 0 3cqw rgba(255,106,42,.5); }
 
-/* Visor */
-.viewer { background: var(--surface); border-radius: 26px; overflow: hidden; box-shadow: 0 1px 0 var(--line), 0 24px 60px -30px rgba(10, 20, 50, .35); min-width: 0; }
+/* Visor y configurador */
+.viewer { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; min-width: 0; }
 .stage {
-  position: relative; aspect-ratio: 1 / 1; max-height: 520px; width: 100%;
-  /* escena fija: mesa de madera con luces cálidas de fondo, igual en tema claro y oscuro */
+  position: relative; aspect-ratio: 1 / 1; max-height: 560px; width: 100%;
   background:
-    radial-gradient(circle at 14% 17%, rgba(255,206,140,.55) 0, rgba(255,206,140,.2) 4%, transparent 7.5%),
-    radial-gradient(circle at 36% 9%, rgba(255,214,160,.45) 0, rgba(255,214,160,.16) 3.5%, transparent 6.5%),
-    radial-gradient(circle at 60% 15%, rgba(255,198,130,.5) 0, rgba(255,198,130,.18) 4.5%, transparent 8%),
-    radial-gradient(circle at 83% 8%, rgba(255,214,160,.45) 0, rgba(255,214,160,.16) 3.5%, transparent 6.5%),
-    linear-gradient(#1f140d, #120b07 50%);
+    radial-gradient(circle at 14% 17%, rgba(255,206,140,.5) 0, rgba(255,206,140,.18) 4%, transparent 7.5%),
+    radial-gradient(circle at 36% 9%, rgba(255,214,160,.4) 0, rgba(255,214,160,.14) 3.5%, transparent 6.5%),
+    radial-gradient(circle at 60% 15%, rgba(255,198,130,.45) 0, rgba(255,198,130,.16) 4.5%, transparent 8%),
+    radial-gradient(circle at 83% 8%, rgba(255,214,160,.4) 0, rgba(255,214,160,.14) 3.5%, transparent 6.5%),
+    linear-gradient(#1f140d, #0e0805 55%);
   touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none;
 }
 .stage:active { cursor: grabbing; }
 .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.stage-hint { position: absolute; left: 14px; bottom: 12px; font-size: 0.8rem; color: #e9dccd; background: rgba(18,11,7,.72); padding: 4px 10px; border-radius: 999px; pointer-events: none; }
-.stage-fallback, .stage-loading { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: #e9dccd; }
-.stage-loading { font-size: .95rem; opacity: .8; pointer-events: none; }
+.stage-hint { position: absolute; left: 12px; bottom: 12px; font-family: var(--font-mono); font-size: .7rem; text-transform: uppercase; letter-spacing: .04em; color: #e9dccd; background: rgba(10,10,9,.75); padding: 5px 9px; pointer-events: none; }
+.stage-tag { position: absolute; right: 12px; top: 12px; font-family: var(--font-mono); font-size: .7rem; text-transform: uppercase; color: #e9dccd; background: rgba(10,10,9,.75); padding: 5px 9px; pointer-events: none; }
+.stage-fallback, .stage-loading { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: #e9dccd; font-family: var(--font-mono); font-size: .8rem; text-transform: uppercase; }
+.stage-loading { opacity: .8; pointer-events: none; }
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-.config { padding: 18px; display: grid; gap: 16px; }
-.opt { display: grid; gap: 7px; min-width: 0; }
-.opt-label { font-size: 0.74rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.opt-label b { color: var(--ink); letter-spacing: 0; text-transform: none; font-size: 0.9rem; font-weight: 500; margin-left: 6px; }
-.seg { display: flex; background: var(--bg); border-radius: 12px; padding: 4px; gap: 4px; }
-.seg button {
-  flex: 1; min-width: 0; font: inherit; font-size: 0.95rem; font-weight: 500; color: var(--ink);
-  background: transparent; border: 0; border-radius: 9px; padding: 9px 4px; min-height: 44px; cursor: pointer;
-}
-.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); font-weight: 700; }
-.swatches { display: flex; flex-wrap: wrap; gap: 10px; }
-.stand-chip { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.25); }
-.swatch { width: 40px; height: 40px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; box-shadow: inset 0 0 0 1.5px var(--line); }
-.swatch[aria-pressed="true"] { outline: 3px solid var(--accent); outline-offset: 3px; }
+.config { padding: 18px; display: grid; gap: 18px; }
+.opt { display: grid; gap: 8px; min-width: 0; }
+.opt-label { font-family: var(--font-mono); font-size: .72rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.opt-label b { color: var(--ink); font-weight: 500; margin-left: 6px; }
+.cart { display: grid; gap: 6px; }
+.cart-row { display: flex; align-items: center; gap: 12px; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 6px 6px 12px; }
+.cart-name { flex: 1; min-width: 0; font-weight: 500; }
+.chip { width: 20px; height: 31px; border-radius: 3px; flex: none; box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); }
+.chip-negra { background: #1b1c27; }
+.chip-blanca { background: #f6f6f3; }
+.qty { display: flex; align-items: center; gap: 4px; }
+.qty button { width: 44px; height: 44px; border-radius: var(--radius); border: 1px solid var(--line); background: transparent; color: var(--ink); font: inherit; font-size: 1.3rem; line-height: 1; cursor: pointer; }
+.qty button:hover:not(:disabled) { border-color: var(--ink); }
+.qty button:disabled { opacity: .3; cursor: default; }
+.qty output { min-width: 2.2em; text-align: center; font-family: var(--font-mono); font-weight: 500; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.btn[aria-disabled="true"] { opacity: .4; pointer-events: none; cursor: default; }
+.seg { display: flex; border: 1px solid var(--line); border-radius: var(--radius); padding: 3px; gap: 3px; }
+.seg button { flex: 1; min-width: 0; font-family: var(--font-mono); font-size: .76rem; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); background: transparent; border: 0; border-radius: 2px; padding: 9px 4px; min-height: 44px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.stand-chip { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 7px; vertical-align: -1px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.3); }
 .logo-fields { display: grid; gap: 10px; }
-.logo-fields input[type="text"] { font: inherit; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 12px; padding: 11px 14px; width: 100%; min-width: 0; }
-.logo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.logo-thumb { width: 40px; height: 40px; border-radius: 10px; background: var(--bg) center / contain no-repeat; box-shadow: inset 0 0 0 1.5px var(--line); }
-.hint { font-size: 0.85rem; color: var(--muted); }
-.hint .best { color: var(--ink); background: var(--star); padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
-.buy { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 16px; }
-.buy-price { font-family: var(--font-display); font-weight: 800; font-size: 2rem; line-height: 1; font-variant-numeric: tabular-nums; }
-.buy-sub { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+.logo-fields input[type="text"] { font: inherit; color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 11px 14px; width: 100%; min-width: 0; }
+.logo-fields input[type="text"]:focus { border-color: var(--accent); outline: none; }
+.logo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.logo-thumb { width: 40px; height: 40px; border-radius: var(--radius); background: var(--surface-2) center / contain no-repeat; box-shadow: inset 0 0 0 1px var(--line); }
+.hint { font-size: .86rem; color: var(--muted); }
+.hint .best { color: var(--accent-ink); background: var(--accent); padding: 1px 7px; white-space: nowrap; font-weight: 600; }
+.buy { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 16px; }
+.buy-price { font-family: var(--font-display); font-stretch: 62%; font-variation-settings: "wdth" 62; font-weight: 800; font-size: 3.4rem; line-height: .9; font-variant-numeric: tabular-nums; }
+.buy-sub { color: var(--muted); font-size: .86rem; margin-top: 6px; }
+@media (min-width: 960px) {
+  .viewer { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); }
+  .viewer .stage { aspect-ratio: auto; max-height: none; min-height: 600px; height: 100%; border-right: 1px solid var(--line); }
+  .config { padding: 22px; }
+}
 
-/* Secciones = escenas */
-html { scroll-snap-type: y proximity; scroll-padding-top: 0; }
-.scene { position: relative; min-height: 100vh; min-height: 100svh; display: flex; align-items: center; padding-block: 84px 36px; scroll-snap-align: start; overflow: clip; }
-.scene > .inner { width: 100%; }
-.sec-head { display: grid; gap: 10px; margin-bottom: 26px; max-width: 40em; }
-.sec-head p { color: var(--muted); }
-.band { background: var(--surface); }
-[id] { scroll-margin-top: 0; }
-/* barra superior fija, progreso y puntos de navegación */
-.topbar { position: fixed; z-index: 30; top: 0; left: 0; right: 0; padding-top: env(safe-area-inset-top, 0px); background: color-mix(in srgb, var(--bg) 80%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
-.prog { height: 3px; background: var(--accent); transform-origin: 0 50%; transform: scaleX(var(--prog, 0)); }
-.dots { position: fixed; z-index: 25; right: max(8px, env(safe-area-inset-right, 0px)); top: 50%; transform: translateY(-50%); display: grid; gap: 2px; }
-.dots a { display: flex; align-items: center; justify-content: flex-end; gap: 10px; min-width: 24px; height: 24px; text-decoration: none; color: var(--ink); font-size: .8rem; font-weight: 600; }
-.dots span { opacity: 0; transform: translateX(6px); transition: opacity .2s, transform .2s; background: var(--surface); padding: 2px 9px; border-radius: 99px; box-shadow: 0 0 0 1px var(--line); pointer-events: none; white-space: nowrap; }
-.dots i { width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--muted); opacity: .45; transition: transform .3s, opacity .3s, background .3s; }
-.dots a[aria-current="true"] i { background: var(--accent); opacity: 1; transform: scale(1.6); }
-@media (hover: hover) { .dots a:hover span { opacity: 1; transform: none; } }
-@media (max-width: 720px) { .dots { display: none; } }
-/* transiciones entre escenas: entran en cascada, salen atenuándose (todo con transform y opacity) */
-.js .scene > .inner { transform: translateY(calc(var(--in, 0) * 44px - var(--out, 0) * 34px)) scale(calc(1 - var(--out, 0) * .05)); opacity: calc(1 - var(--out, 0) * .85 - var(--in, 0) * .5); }
-.js .rv { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .85s cubic-bezier(.2, .8, .2, 1); transition-delay: calc(var(--i, 0) * 70ms); }
-.js .scene.in .rv { opacity: 1; transform: none; }
-.js .scene:not(.in) .rv { transition-delay: 0s; transition-duration: .3s; }
-.js .demo.rv { transform: translateY(28px) scale(.97); }
-.js .scene.in .demo.rv { transform: none; }
-
-#pedido .sec-head { margin-bottom: 14px; gap: 6px; }
-#pedido .sec-head h2 { font-size: clamp(1.55rem, 3.6vw, 2.1rem); }
-@media (min-width: 900px) { #pedido .viewer .stage { min-height: 470px; } #pedido .config { padding: 14px 18px; gap: 11px; } #pedido .buy { padding-top: 12px; } }
-.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: paso; }
-.steps li { counter-increment: paso; position: relative; display: grid; gap: 8px; padding: 22px 22px 24px; border-radius: var(--radius); background: var(--bg); box-shadow: 0 0 0 1px var(--line); }
-.steps li::before { content: counter(paso); font-family: var(--font-display); font-weight: 800; font-size: 3rem; line-height: 1; color: var(--accent); }
-.steps h3 { font-size: 1.3rem; }
-.steps p { color: var(--muted); }
-@media (min-width: 800px) { .steps { grid-template-columns: repeat(3, 1fr); gap: 22px; } .steps li { padding: 30px 28px 34px; gap: 12px; } .steps li::before { font-size: 4.2rem; } }
-
-.benefits { display: grid; gap: 26px 40px; }
-.benefits div { position: relative; padding-top: 16px; }
-.benefits div::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--ink); }
-.js .benefits div::before { transform: scaleX(0); transform-origin: 0 50%; transition: transform .9s ease calc(var(--i, 0) * 90ms + 250ms); }
-.js .scene.in .benefits div::before { transform: scaleX(1); }
-.benefits p { color: var(--muted); margin-top: 6px; }
-@media (min-width: 700px) { .benefits { grid-template-columns: repeat(2, 1fr); } }
-
-.faq { display: grid; gap: 0; max-width: 46em; }
+/* FAQ */
+.faq-grid { display: grid; gap: 30px; }
+@media (min-width: 960px) { .faq-grid { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 56px; } }
+.faq { display: grid; border-top: 1px solid var(--line); }
 .faq details { border-bottom: 1px solid var(--line); }
-.faq summary { cursor: pointer; list-style: none; padding: 18px 0; font-weight: 700; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary { cursor: pointer; list-style: none; padding: 18px 0; font-weight: 600; font-size: 1.05rem; display: flex; justify-content: space-between; gap: 16px; }
 .faq summary::-webkit-details-marker { display: none; }
-.faq summary::after { content: "+"; font-family: var(--font-display); font-size: 1.4rem; line-height: 1; color: var(--muted); }
-.faq details[open] summary::after { content: "–"; }
-.faq details p { color: var(--muted); padding-bottom: 18px; max-width: 40em; }
-
-.scene-end { flex-direction: column; align-items: stretch; }
-.scene-end > .inner { margin-block: auto; }
-.contact { display: grid; gap: 18px; justify-items: center; text-align: center; }
-.contact .num { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.6rem, 6vw, 2.4rem); user-select: all; }
-.foot-nav { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-bottom: 14px; }
-.foot-nav a { color: var(--ink); font-weight: 500; text-decoration: none; }
-.foot-nav a:hover { text-decoration: underline; }
+.faq summary::after { content: "+"; font-family: var(--font-mono); font-size: 1.1rem; line-height: 1.3; color: var(--accent); transition: transform .25s; }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { color: var(--muted); padding-bottom: 20px; max-width: 42em; }
 .faq a { color: var(--accent); }
+
+/* Cierre */
+footer { padding-block: 22px 30px; color: var(--muted); font-size: .8rem; border-top: 1px solid var(--line); }
+.foot-nav { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-bottom: 14px; font-family: var(--font-mono); font-size: .74rem; text-transform: uppercase; letter-spacing: .04em; }
+.foot-nav a { color: var(--ink); text-decoration: none; }
+.foot-nav a:hover { color: var(--accent); }
 .wa-float {
   position: fixed; z-index: 20; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   width: 56px; height: 56px; border-radius: 50%; background: var(--wa); color: var(--wa-ink); display: grid; place-items: center;
-  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, .5);
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, .6);
 }
 .wa-float svg { width: 28px; height: 28px; }
-footer { padding-block: 22px 28px; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); }
 
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; scroll-snap-type: none; } .btn { transition: none; } .js .rv, .js .benefits div::before { transition: none; opacity: 1; transform: none; } .js .scene > .inner { transform: none; opacity: 1; } }
+/* Puntos de navegación */
+.dots { position: fixed; z-index: 25; right: max(10px, env(safe-area-inset-right, 0px)); top: 50%; transform: translateY(-50%); display: grid; gap: 2px; }
+.dots a { display: flex; align-items: center; justify-content: flex-end; gap: 10px; min-width: 24px; height: 24px; text-decoration: none; color: var(--ink); font-family: var(--font-mono); font-size: .68rem; text-transform: uppercase; }
+.dots span { opacity: 0; transform: translateX(6px); transition: opacity .2s, transform .2s; background: var(--surface); padding: 3px 8px; box-shadow: 0 0 0 1px var(--line); pointer-events: none; white-space: nowrap; }
+.dots i { width: 6px; height: 6px; margin-right: 9px; background: var(--muted); opacity: .5; transition: transform .3s, opacity .3s, background .3s; }
+.dots a[aria-current="true"] i { background: var(--accent); opacity: 1; transform: scale(1.6); }
+@media (hover: hover) { .dots a:hover span { opacity: 1; transform: none; } }
+@media (max-width: 1100px) { .dots { display: none; } }
+
+/* Portada: el celular escaneando ocupa la pantalla */
+.portada { position: relative; padding: 0; border-top: 0; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-end; overflow: clip; }
+.portada .demo { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; aspect-ratio: auto; border-radius: 0; box-shadow: none; }
+.portada .demo-blur { filter: blur(30px) brightness(.4); }
+.portada-copy { position: relative; z-index: 4; display: grid; gap: 16px; padding-bottom: 72px; width: 100%; }
+.portada-copy h1 { font-size: clamp(2.6rem, 8.6vw, 5rem); max-width: 9.5em; }
+@media (min-width: 900px) { .portada-copy h1, .portada-copy .lead { max-width: min(560px, 46vw); } .portada-copy h1 { font-size: clamp(3.4rem, 5.4vw, 5.4rem); } }
+.portada-copy .lead { color: #c9c6bd; max-width: 30em; }
+.portada .demo-cap { bottom: auto; top: calc(74px + env(safe-area-inset-top, 0px)); }
+@media (min-width: 900px) {
+  .portada .dscene { left: 70%; }
+  .portada::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; background: linear-gradient(90deg, rgba(10,10,9,.95) 0%, rgba(10,10,9,.85) 40%, rgba(10,10,9,.2) 58%, transparent 66%); }
+  .portada-copy { margin-bottom: auto; margin-top: auto; padding-top: 80px; }
+  .portada .demo-cap { left: 70%; top: auto; bottom: 22px; }
+}
+@media (max-width: 899px) {
+  .portada { display: block; min-height: 0; }
+  .portada .demo { position: relative; inset: auto; height: 64svh; }
+  .portada-copy { padding-top: 22px; padding-bottom: 40px; }
+  .portada .demo-cap { top: auto; bottom: 14px; }
+}
+.scroll-cue { position: absolute; z-index: 5; left: 50%; bottom: 18px; width: 30px; height: 46px; margin-left: -15px; border: 1.5px solid rgba(255,255,255,.5); border-radius: 99px; }
+.scroll-cue span { position: absolute; left: 50%; top: 8px; width: 4px; height: 8px; margin-left: -2px; border-radius: 4px; background: #fff; animation: cue 1.4s ease-in-out infinite; }
+@keyframes cue { 0% { transform: translateY(0); opacity: 1; } 80% { transform: translateY(16px); opacity: 0; } 100% { opacity: 0; } }
+@media (max-width: 899px) { .scroll-cue { display: none; } }
+
+/* Modelos: fijado en pantalla, cada madera entra con un círculo que se abre, zoom y fotos flotando */
+.modelos { height: 660vh; padding: 0; border-top: 0; }
+.m-pin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: #000; }
+.m-slide { position: absolute; inset: 0; clip-path: circle(var(--r, 0%) at 50% 55%); will-change: clip-path; }
+.m-slide[data-k="0"] { --r: 150%; }
+.m-main { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 60%; transform: scale(var(--s, 1)); will-change: transform; }
+.m-fl { position: absolute; width: clamp(110px, 22vw, 290px); height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; box-shadow: 0 30px 60px -20px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.15); transform: translate3d(0, var(--y, 0), 0) rotate(var(--rot, 0deg)); will-change: transform; }
+.m-fl1 { left: 4%; top: 14%; }
+.m-fl2 { right: 4%; top: 48%; object-position: 55% 78%; }
+.m-name { position: absolute; left: 0; right: 0; bottom: 16%; margin: 0; text-align: center; white-space: nowrap; color: #fff; mix-blend-mode: difference;
+  font-family: var(--font-display); font-stretch: 62%; font-variation-settings: "wdth" 62; font-weight: 800; text-transform: uppercase; line-height: .8; font-size: clamp(5rem, 26vw, 22rem);
+  transform: translate3d(var(--x, 0), 0, 0) scale(var(--ns, 1)); will-change: transform; }
+.m-ui { position: absolute; z-index: 5; left: 0; right: 0; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; padding: 0 76px 0 16px; }
+.m-tabs { display: flex; gap: 4px; padding: 4px; border-radius: 99px; background: rgba(10,10,9,.7); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.m-tabs button { font-family: var(--font-mono); font-size: .74rem; text-transform: uppercase; color: #cfcbc2; background: transparent; border: 0; border-radius: 99px; padding: 8px 12px; min-height: 38px; cursor: pointer; transition: background-color .2s, color .2s; }
+.m-tabs button[aria-current="true"] { background: #fff; color: #000; }
+.m-ui .btn { border-radius: 99px; }
+.m-bar { position: absolute; z-index: 5; left: 0; right: 0; top: calc(58px + env(safe-area-inset-top, 0px)); height: 3px; background: rgba(255,255,255,.15); }
+.m-bar i { position: absolute; inset: 0; background: var(--accent); transform-origin: 0 50%; transform: scaleX(var(--p, 0)); }
+@media (max-width: 899px) {
+  .m-fl { width: 31vw; }
+  .m-fl1 { top: 13%; } .m-fl2 { top: 44%; }
+  .m-name { bottom: 22%; }
+}
+
+/* Cómo funciona: tarjetas con foto */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; counter-reset: paso; }
+.steps li { counter-increment: paso; position: relative; display: grid; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.steps li img { width: 100%; height: 220px; object-fit: cover; object-position: 50% 62%; display: block; transition: transform .5s cubic-bezier(.2,.8,.2,1); }
+.steps li:hover img { transform: scale(1.08); }
+.steps li::before { content: counter(paso); position: absolute; z-index: 2; top: 12px; left: 12px; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-family: var(--font-display); font-weight: 800; font-size: 1.4rem; }
+.steps li > div { padding: 18px 20px 22px; display: grid; gap: 8px; }
+.steps h3 { font-size: 1.25rem; }
+.steps p { color: var(--muted); }
+@media (min-width: 800px) { .steps { grid-template-columns: repeat(3, 1fr); gap: 20px; } .steps li img { height: 280px; } }
+
+/* Beneficios: fotos grandes con el texto encima */
+.benefits { display: grid; gap: 14px; }
+.benefits > div { position: relative; min-height: 340px; border-radius: 14px; overflow: hidden; display: flex; align-items: flex-end; isolation: isolate; }
+.benefits img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 60%; z-index: -2; transition: transform .6s cubic-bezier(.2,.8,.2,1); }
+.benefits > div:hover img { transform: scale(1.07); }
+.benefits > div::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, transparent 30%, rgba(10,10,9,.88) 72%); }
+.benefits > div > div { padding: 22px; display: grid; gap: 6px; }
+.benefits h3 { font-size: 1.3rem; color: #fff; }
+.benefits p { color: #d4d0c7; }
+@media (min-width: 760px) { .benefits { grid-template-columns: repeat(2, 1fr); gap: 18px; } .benefits > div { min-height: 420px; } }
+
+.contact { display: grid; gap: 22px; justify-items: start; }
+.contact h2 { font-size: clamp(3rem, 10vw, 8rem); max-width: 10em; }
+
+/* Entradas rápidas con movimiento (sin JS todo se ve igual) */
+.js .words .w { display: inline-block; opacity: 0; transform: translateY(.7em) rotate(7deg); transform-origin: 0 100%; transition: opacity .35s ease, transform .55s cubic-bezier(.2, 1.35, .35, 1); transition-delay: calc(var(--i, 0) * 38ms); }
+.js .in .words .w { opacity: 1; transform: none; }
+.js .fly { opacity: 0; transform: translateY(36px); transition: opacity .4s ease, transform .5s cubic-bezier(.2, 1.2, .35, 1); transition-delay: calc(var(--d, 0) * 1ms + 180ms); }
+.js .in .fly { opacity: 1; transform: none; }
+.js .pop { opacity: 0; transform: translateY(70px) scale(.86) rotate(-3deg); transition: opacity .4s ease, transform .6s cubic-bezier(.2, 1.3, .35, 1); transition-delay: calc(var(--i, 0) * 70ms); }
+.js .pop:nth-child(even) { transform: translateY(70px) scale(.86) rotate(3deg); }
+.js .in .pop { opacity: 1; transform: none; }
+.js #visor { opacity: 0; transform: translateY(60px) scale(.94); transition: opacity .45s ease, transform .6s cubic-bezier(.2, 1.2, .35, 1) .1s; }
+.js .in #visor { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .js .words .w, .js .fly, .js .pop, .js #visor { transition: none; opacity: 1; transform: none; }
+  .scroll-cue span { animation: none; }
+}
+
+/* Tipografía: la de la web anterior. Bricolage Grotesque en títulos y DM Sans en el resto */
+:root { --font-display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif; --font-body: "DM Sans", "Segoe UI", system-ui, sans-serif; --font-mono: var(--font-body); }
+.disp, h1, h2, .readouts b, .buy-price, .m-name { font-stretch: normal; font-variation-settings: normal; }
+h1, h2 { text-transform: none; letter-spacing: -0.03em; line-height: 1; font-weight: 800; }
+.portada-copy h1 { font-size: clamp(2.4rem, 8vw, 4.4rem); }
+@media (min-width: 900px) { .portada-copy h1 { font-size: clamp(3rem, 4.4vw, 4.4rem); } }
+h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
+.contact h2 { font-size: clamp(2.5rem, 7.5vw, 5.2rem); }
+.m-name { text-transform: none; letter-spacing: -0.05em; font-size: clamp(4.2rem, 21vw, 16rem); line-height: .9; }
+.btn, .nav, .brand, .tag, .eyebrow, .opt-label, .seg button, .m-tabs button, .stage-hint, .stage-tag, .demo-cap, .foot-nav, .dots a, .stage-loading, .stage-fallback { text-transform: none; letter-spacing: 0; }
+.btn { font-size: .98rem; font-weight: 700; border-radius: 99px; }
+.btn-sm { font-size: .88rem; }
+.nav { font-size: .95rem; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; }
+.eyebrow, .tag { font-size: .85rem; font-weight: 700; }
+.eyebrow::after, .tag::before, .tag::after { content: none; }
+.eyebrow::before { content: "★★★★★"; color: var(--star); letter-spacing: 2px; margin-right: 10px; }
+.opt-label { font-size: .8rem; font-weight: 700; }
+.seg button, .m-tabs button { font-size: .92rem; font-weight: 500; }
+.seg button[aria-pressed="true"], .m-tabs button[aria-current="true"] { font-weight: 700; }
+.demo-cap { font-family: var(--font-display); font-weight: 600; font-size: .98rem; border-radius: 99px; }
+.stage-hint, .stage-tag { font-size: .8rem; border-radius: 99px; }
+.qty output, .contact .num { font-family: var(--font-display); font-weight: 800; }
 </style>
 
 </head>
 <body>
-<header class="topbar"><div class="prog" id="prog" aria-hidden="true"></div><div class="wrap head">
+<header class="topbar"><div class="wrap head">
   <a class="brand" href="#inicio"><i></i><span data-marca>Placas NFC</span></a>
   <nav class="nav" aria-label="Secciones">
     <a href="#como-funciona">Cómo funciona</a>
@@ -319,29 +397,10 @@ footer { padding-block: 22px 28px; color: var(--muted); font-size: 0.85rem; bord
     <a href="#preguntas">Preguntas</a>
   </nav>
   <a class="btn btn-wa btn-sm" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener">WhatsApp</a>
-</div></header>
+</div><div class="prog" id="prog" aria-hidden="true"></div></header>
 <nav class="dots" id="dots" aria-label="Secciones de la página"></nav>
 <main>
-  <section class="scene scene-hero" id="inicio" data-nombre="Inicio">
-  <div class="wrap hero inner">
-    <div class="hero-copy">
-      <p class="eyebrow">Placas NFC para locales de Uruguay</p>
-      <h1>Más reseñas en Google con solo acercar el celular</h1>
-      <p class="lead">Ponés la placa en el mostrador o en la mesa. Tu cliente acerca el celular y se le abre la página para dejarte la reseña. Sin apps y sin buscar tu local.</p>
-      <div class="hero-cta">
-        <a class="btn btn-primary" href="#pedido">Armar mi pedido</a>
-        <a class="btn btn-ghost" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.200-1.200l-.3-.2-3 .8.8-2.900-.2-.3A8.200 8.200 0 1 1 12 20.200zm4.500-6.100c-.200-.100-1.500-.700-1.700-.800-.200-.100-.400-.100-.600.100l-.800 1c-.100.200-.300.200-.500.100a6.700 6.700 0 0 1-3.300-2.900c-.200-.400.200-.400.700-1.300.100-.200 0-.300 0-.500l-.800-1.900c-.200-.500-.400-.400-.600-.400h-.500c-.200 0-.500.100-.700.300-.900.900-1 2.100-.300 3.400a11 11 0 0 0 4.600 4.300c1.700.700 2.400.800 3.200.700.500-.100 1.500-.600 1.700-1.200.200-.600.200-1.100.100-1.200-.100-.100-.200-.200-.500-.300z"/></svg>
-          Consultar por WhatsApp
-        </a>
-      </div>
-      <ul class="ticks">
-        <li>Llegan programadas</li>
-        <li>Pago único</li>
-        <li>iPhone y Android</li>
-      </ul>
-    </div>
-
+  <section class="sec portada" id="inicio" data-nombre="Inicio">
     <div class="demo" id="demo" role="img" aria-label="Animación: un celular se acerca a la placa de bambú, la escanea, le salta un aviso y deja la reseña de 5 estrellas.">
       <img class="demo-blur" src="img/taco_bambu_negra_34.jpg" alt="" aria-hidden="true">
       <div class="dscene" aria-hidden="true">
@@ -370,33 +429,73 @@ footer { padding-block: 22px 28px; color: var(--muted); font-size: 0.85rem; bord
       </div>
       <p class="demo-cap" id="demo-cap" aria-hidden="true">El cliente acerca el celular</p>
     </div>
-  </div>
+    <div class="portada-copy wrap">
+      <p class="eyebrow fly">Placas NFC para locales de Uruguay</p>
+      <h1 class="words">Más reseñas en Google con solo acercar el celular</h1>
+      <p class="lead fly">Ponés la placa en el mostrador o en la mesa. Tu cliente acerca el celular y se le abre la página para dejarte la reseña. Sin apps y sin buscar tu local.</p>
+      <div class="hero-cta fly">
+        <a class="btn btn-primary" href="#pedido">Armar mi pedido</a>
+        <a class="btn btn-ghost" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.200-1.200l-.3-.2-3 .8.8-2.900-.2-.3A8.200 8.200 0 1 1 12 20.200zm4.500-6.100c-.200-.100-1.500-.700-1.700-.800-.200-.100-.400-.100-.600.100l-.800 1c-.100.200-.300.200-.500.100a6.700 6.700 0 0 1-3.300-2.900c-.200-.400.200-.400.700-1.300.100-.200 0-.300 0-.500l-.800-1.900c-.200-.500-.400-.400-.600-.400h-.500c-.200 0-.500.100-.700.300-.900.900-1 2.100-.300 3.400a11 11 0 0 0 4.600 4.300c1.700.700 2.400.800 3.200.700.500-.100 1.500-.600 1.700-1.200.200-.600.200-1.100.100-1.200-.100-.100-.200-.200-.500-.300z"/></svg> Consultar por WhatsApp</a>
+      </div>
+    </div>
+    <a class="scroll-cue" href="#modelos" aria-label="Ver los modelos"><span></span></a>
   </section>
 
-  <section class="scene band" id="como-funciona" data-nombre="Cómo funciona">
-    <div class="wrap inner">
-      <div class="sec-head">
-        <h2>Tres pasos y ya estás juntando reseñas</h2>
+  <section class="sec modelos" id="modelos" data-nombre="Modelos" aria-label="Los tres soportes de madera">
+    <div class="m-pin">
+      <div class="m-slide" data-k="0">
+        <img class="m-main" src="img/taco_bambu_negra_34.jpg" alt="Tarjeta NFC negra en soporte de bambú" width="1080" height="1350">
+        <img class="m-fl m-fl1" src="img/taco_bambu_negra_perfil.jpg" alt="" width="1080" height="1350" loading="lazy">
+        <img class="m-fl m-fl2" src="img/taco_bambu_blanca_34.jpg" alt="" width="1080" height="1350" loading="lazy">
+        <p class="m-name" aria-hidden="true">Bambú</p>
       </div>
+      <div class="m-slide" data-k="1">
+        <img class="m-main" src="img/taco_pino_negra_34.jpg" alt="Tarjeta NFC negra en soporte de pino" width="1080" height="1350" loading="lazy">
+        <img class="m-fl m-fl1" src="img/taco_pino_negra_perfil.jpg" alt="" width="1080" height="1350" loading="lazy">
+        <img class="m-fl m-fl2" src="img/taco_pino_blanca_34.jpg" alt="" width="1080" height="1350" loading="lazy">
+        <p class="m-name" aria-hidden="true">Pino</p>
+      </div>
+      <div class="m-slide" data-k="2">
+        <img class="m-main" src="img/taco_quemado_negra_34.jpg" alt="Tarjeta NFC negra en soporte de madera quemada" width="1080" height="1350" loading="lazy">
+        <img class="m-fl m-fl1" src="img/taco_quemado_negra_perfil.jpg" alt="" width="1080" height="1350" loading="lazy">
+        <img class="m-fl m-fl2" src="img/taco_quemado_blanca_34.jpg" alt="" width="1080" height="1350" loading="lazy">
+        <p class="m-name" aria-hidden="true">Quemada</p>
+      </div>
+      <div class="m-ui">
+        <div class="m-tabs" id="m-tabs">
+          <button type="button" data-go="0" aria-current="true">Bambú</button>
+          <button type="button" data-go="1">Pino</button>
+          <button type="button" data-go="2">Quemada</button>
+        </div>
+        <a class="btn btn-primary btn-sm" href="#pedido" id="m-pick">Elegir esta</a>
+      </div>
+      <div class="m-bar" aria-hidden="true"><i id="m-bar"></i></div>
+    </div>
+  </section>
+
+  <section class="sec" id="como-funciona" data-nombre="Cómo funciona">
+    <div class="wrap">
+      <div class="sec-head"><h2 class="words">Tres pasos y ya estás juntando reseñas</h2></div>
       <ol class="steps">
-        <li><div><h3>Nos pasás tu local</h3><p>Nos mandás el nombre o el link de tu negocio en Google Maps y programamos las tarjetas con tu página de reseñas.</p></div></li>
-        <li><div><h3>Las ponés a la vista</h3><p>En el mostrador, la caja o cada mesa. El soporte las deja paradas y mirando al cliente.</p></div></li>
-        <li><div><h3>El cliente acerca el celular</h3><p>Se le abre la pantalla para puntuarte y escribir. Le lleva menos de un minuto mientras espera la cuenta.</p></div></li>
+        <li class="pop"><img src="img/taco_quemado_blanca_34.jpg" alt="" width="1080" height="1350" loading="lazy"><div><h3>Nos pasás tu local</h3><p>Nos mandás el nombre o el link de tu negocio en Google Maps y programamos las tarjetas con tu página de reseñas.</p></div></li>
+        <li class="pop"><img src="img/taco_pino_blanca_34.jpg" alt="" width="1080" height="1350" loading="lazy"><div><h3>Las ponés a la vista</h3><p>En el mostrador, la caja o cada mesa. El soporte las deja paradas y mirando al cliente.</p></div></li>
+        <li class="pop"><img src="img/taco_bambu_negra_perfil.jpg" alt="" width="1080" height="1350" loading="lazy"><div><h3>El cliente acerca el celular</h3><p>Se le abre la pantalla para puntuarte y escribir. Le lleva menos de un minuto mientras espera la cuenta.</p></div></li>
       </ol>
     </div>
   </section>
 
-  <section class="scene" id="pedido" data-nombre="Armá tu pedido">
-    <div class="wrap inner">
+  <section class="sec" id="pedido" data-nombre="Armá tu pedido">
+    <div class="wrap">
       <div class="sec-head">
-        <h2>Armá tu pedido</h2>
-        <p>Elegí cuántas tarjetas querés de cada color y mirá cómo quedan. Cada tarjeta viene con su soporte.</p>
+        <h2 class="words">Armá tu pedido</h2>
+        <p class="fly">Elegí cuántas tarjetas querés de cada color y mirá cómo quedan. Cada tarjeta viene con su soporte.</p>
       </div>
   <div class="viewer" id="visor">
     <div class="stage" id="stage" role="img" aria-label="Vista 3D de la tarjeta NFC en su soporte. Arrastrá para girarla.">
       <div class="stage-loading" id="stage-loading">Cargando la vista 3D…</div>
       <div class="stage-fallback" id="fallback" hidden>No pudimos cargar la vista 3D en este navegador. Pedinos fotos por WhatsApp.</div>
       <span class="stage-hint" id="stage-hint">Arrastrá para girar</span>
+      <span class="stage-tag" id="stage-tag" aria-hidden="true">Bambú</span>
     </div>
     <div class="config">
       <div class="opt">
@@ -455,28 +554,29 @@ footer { padding-block: 22px 28px; color: var(--muted); font-size: 0.85rem; bord
       </div>
     </div>
   </div>
+
     </div>
   </section>
 
-  <section class="scene band" id="beneficios" data-nombre="Beneficios">
-    <div class="wrap inner">
+  <section class="sec" id="beneficios" data-nombre="Beneficios">
+    <div class="wrap">
       <div class="sec-head">
-        <h2>Por qué le sirve a tu local</h2>
-        <p>Muchos clientes conformes no dejan reseña porque se olvidan o les da pereza buscarte. La placa les saca ese trabajo.</p>
+        <h2 class="words">Por qué le sirve a tu local</h2>
+        <p class="fly">Muchos clientes conformes no dejan reseña porque se olvidan o les da pereza buscarte. La placa les saca ese trabajo.</p>
       </div>
       <div class="benefits">
-        <div><h3>Pedís la reseña en el mejor momento</h3><p>Cuando el cliente todavía está en el local y contento con el servicio, no tres días después.</p></div>
-        <div><h3>Más visibilidad en Google Maps</h3><p>Google tiene en cuenta la cantidad de reseñas y su puntaje para decidir qué negocios mostrar cuando alguien busca en la zona.</p></div>
-        <div><h3>No dependés de nadie</h3><p>No hay app, cuenta ni mensualidad. La tarjeta no usa batería ni internet propio.</p></div>
-        <div><h3>Queda prolija en el mostrador</h3><p>Tarjeta mate de 85,5 × 54 mm, del tamaño de una tarjeta de crédito, en un soporte macizo de madera: bambú, pino o madera quemada.</p></div>
+        <div class="pop"><img src="img/taco_bambu_negra_34.jpg" alt="" width="1080" height="1350" loading="lazy"><div><h3>Pedís la reseña en el mejor momento</h3><p>Cuando el cliente todavía está en el local y contento con el servicio, no tres días después.</p></div></div>
+        <div class="pop"><img src="img/taco_quemado_negra_perfil.jpg" alt="" width="1080" height="1350" loading="lazy"><div><h3>Más visibilidad en Google Maps</h3><p>Google tiene en cuenta la cantidad de reseñas y su puntaje para decidir qué negocios mostrar cuando alguien busca en la zona.</p></div></div>
+        <div class="pop"><img src="img/taco_pino_negra_perfil.jpg" alt="" width="1080" height="1350" loading="lazy"><div><h3>No dependés de nadie</h3><p>No hay app, cuenta ni mensualidad. La tarjeta no usa batería ni internet propio.</p></div></div>
+        <div class="pop"><img src="img/taco_bambu_blanca_34.jpg" alt="" width="1080" height="1350" loading="lazy"><div><h3>Queda prolija en el mostrador</h3><p>Tarjeta mate de 85,5 × 54 mm, del tamaño de una tarjeta de crédito, en un soporte macizo de madera: bambú, pino o madera quemada.</p></div></div>
       </div>
     </div>
   </section>
 
-  <section class="scene" id="preguntas" data-nombre="Preguntas">
-    <div class="wrap inner">
-      <div class="sec-head"><h2>Preguntas frecuentes</h2></div>
-      <div class="faq">
+  <section class="sec" id="preguntas" data-nombre="Preguntas">
+    <div class="wrap">
+      <div class="sec-head"><h2 class="words">Preguntas frecuentes</h2></div>
+      <div class="faq fly">
         <details open><summary>¿El cliente tiene que bajar una app?</summary><p>No. Acerca el celular a la tarjeta y le aparece un aviso que abre directo la página de reseñas de tu local.</p></details>
         <details><summary>¿Funciona con cualquier celular?</summary><p>Con los iPhone desde el XS en adelante y con casi todos los Android que tienen NFC, que es lo mismo que se usa para pagar con el celular.</p></details>
         <details><summary>¿Vienen listas para usar?</summary><p>Sí. Nos pasás tu negocio en Google Maps y te las entregamos programadas. Las sacás de la bolsa y las ponés en el mostrador.</p></details>
@@ -490,12 +590,14 @@ footer { padding-block: 22px 28px; color: var(--muted); font-size: 0.85rem; bord
     </div>
   </section>
 
-  <section class="scene scene-end band" id="contacto" data-nombre="Contacto">
-    <div class="wrap contact inner">
-      <h2>Escribinos y te las armamos</h2>
-      <p class="lead">Contanos cuántas placas querés y el nombre de tu local. Te respondemos por WhatsApp.</p>
-      <div class="num" data-wa-num>095 833 281</div>
-      <a class="btn btn-wa" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener">Abrir WhatsApp</a>
+  <section class="sec" id="contacto" data-nombre="Contacto">
+    <div class="wrap contact">
+      <h2 class="words">Escribinos y te las armamos</h2>
+      <p class="lead fly">Contanos cuántas placas querés y el nombre de tu local. Te respondemos por WhatsApp.</p>
+      <div class="contact-row fly">
+        <a class="btn btn-wa" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.200-1.200l-.3-.2-3 .8.8-2.900-.2-.3A8.200 8.200 0 1 1 12 20.200zm4.500-6.100c-.200-.100-1.500-.700-1.700-.800-.200-.100-.400-.100-.600.100l-.800 1c-.100.200-.300.200-.500.100a6.700 6.700 0 0 1-3.300-2.900c-.200-.400.200-.400.700-1.300.100-.200 0-.300 0-.500l-.800-1.900c-.200-.500-.400-.400-.600-.400h-.500c-.200 0-.500.100-.700.300-.900.900-1 2.100-.300 3.400a11 11 0 0 0 4.600 4.300c1.700.700 2.400.800 3.200.700.500-.100 1.500-.600 1.700-1.200.200-.600.200-1.100.100-1.200-.100-.100-.200-.200-.500-.300z"/></svg> Abrir WhatsApp</a>
+        <span class="num" data-wa-num>095 833 281</span>
+      </div>
     </div>
     <footer>
       <div class="wrap">
@@ -510,6 +612,7 @@ footer { padding-block: 22px 28px; color: var(--muted); font-size: 0.85rem; bord
     </footer>
   </section>
 </main>
+
 
 <a class="wa-float" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener" aria-label="Escribirnos por WhatsApp">
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.100L2 22l5-1.300A10 10 0 1 0 12 2zm0 18.200c-1.500 0-3-.400-4.200-1.200l-.300-.200-3 .800.800-2.900-.200-.300A8.200 8.200 0 1 1 12 20.200zm4.500-6.100c-.200-.100-1.500-.700-1.700-.800-.200-.100-.400-.100-.600.100l-.800 1c-.100.200-.300.200-.500.100a6.700 6.700 0 0 1-3.300-2.900c-.200-.400.200-.400.700-1.300.100-.200 0-.300 0-.500l-.800-1.900c-.200-.500-.400-.400-.600-.400h-.500c-.200 0-.500.100-.700.300-.900.900-1 2.100-.300 3.400a11 11 0 0 0 4.600 4.300c1.700.700 2.400.800 3.200.700.500-.100 1.500-.600 1.700-1.200.200-.600.200-1.100.100-1.200-.100-.100-.200-.200-.500-.300z"/></svg>
@@ -617,7 +720,7 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     $("#price-live").textContent = "Total " + pesos(total()) + ". " + $("#price-sub").textContent;
     $("#buy-btn").setAttribute("aria-disabled", String(n === 0));
     $("#stage-hint").textContent = "Arrastrá para girar" + (n > MAX_SHOWN ? " · se muestran " + MAX_SHOWN + " de " + n : "");
-    $("#stand-name").textContent = standOf().nombre;
+    $("#stand-name").textContent = standOf().nombre; $("#stage-tag").textContent = standOf().nombre;
     $("#stand-desc").textContent = standOf().desc;
     $("#opt-stand").hidden = $("#opt-logo").hidden = n === 0;
     $("#logo-fields").hidden = !state.logo;
@@ -1176,43 +1279,83 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     lazyIO.observe(stage);
   } else startViewer();
 
-  /* ---------------- Escenas: entrada en cascada, salida suave, progreso y puntos de navegación ----------------
-     Todo parte de un estado visible: sin JavaScript la página se ve completa (la clase "js" activa las animaciones). */
+  /* ---------------- Modelos: la sección queda fija y cada madera entra con zoom ---------------- */
   (function () {
-    var root = document.documentElement, scenes = $$(".scene");
-    var REV = { inicio: [".hero-copy > *", "#demo"], "como-funciona": [".sec-head", ".steps li"], pedido: [".sec-head", "#visor"],
-      beneficios: [".sec-head", ".benefits > div"], preguntas: [".sec-head", ".faq details"], contacto: [".contact > *", "footer"] };
-    scenes.forEach(function (sc) {
-      var i = 0; (REV[sc.id] || []).forEach(function (sel) {
-        Array.prototype.forEach.call(sc.querySelectorAll(sel), function (el) { el.classList.add("rv"); el.style.setProperty("--i", i++); });
+    var sec = $("#modelos"), slides = $$("#modelos .m-slide"), tabs = $$("#m-tabs button"), bar = $("#m-bar");
+    var parts = slides.map(function (s) { return { el: s, main: s.querySelector(".m-main"), fl: s.querySelectorAll(".m-fl"), name: s.querySelector(".m-name") }; });
+    var cur = -1, ticking = false, clamp = function (v, a, b) { return Math.max(a, Math.min(b, v)); };
+    function update() {
+      ticking = false;
+      var vh = window.innerHeight, r = sec.getBoundingClientRect();
+      if (r.bottom < -vh || r.top > vh * 1.5) return;
+      var span = r.height - vh, raw = -r.top / span, p = clamp(raw, 0, 1), seg = raw * 3;
+      bar.style.setProperty("--p", p.toFixed(3));
+      parts.forEach(function (o, k) {
+        var t = seg - k;                                /* < 0 todavía no entró, 0..1 en pantalla, > 1 ya pasó */
+        if (k > 0) {
+          if (t < -0.05) { o.el.style.visibility = "hidden"; return; }
+          o.el.style.visibility = "";
+          o.el.style.setProperty("--r", (clamp(t / 0.32, 0, 1) * 150).toFixed(1) + "%");
+        }
+        if (t > 2.2) return;
+        o.main.style.setProperty("--s", (1.32 - 0.32 * clamp((t + (k ? 0 : 0.35)) / 0.75, 0, 1)).toFixed(3));
+        o.fl[0].style.setProperty("--y", ((0.9 - t) * 55).toFixed(1) + "vh");
+        o.fl[0].style.setProperty("--rot", (-10 + t * 14).toFixed(1) + "deg");
+        o.fl[1].style.setProperty("--y", ((1.1 - t) * 75).toFixed(1) + "vh");
+        o.fl[1].style.setProperty("--rot", (12 - t * 16).toFixed(1) + "deg");
+        o.name.style.setProperty("--x", ((0.45 - t) * 34).toFixed(1) + "vw");
+        o.name.style.setProperty("--ns", (0.75 + 0.25 * clamp(t / 0.4, 0, 1)).toFixed(3));
+      });
+      var k = clamp(Math.floor(seg), 0, 2);
+      if (k !== cur) { cur = k; tabs.forEach(function (b, j) { b.setAttribute("aria-current", String(j === k)); }); }
+    }
+    function queue() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+    window.addEventListener("scroll", queue, { passive: true });
+    window.addEventListener("resize", queue);
+    tabs.forEach(function (b) {
+      b.addEventListener("click", function () {
+        var k = Number(b.dataset.go), top = sec.getBoundingClientRect().top + window.pageYOffset, span = sec.offsetHeight - window.innerHeight;
+        window.scrollTo({ top: top + span * (k + .55) / 3, behavior: REDUCE ? "auto" : "smooth" });
       });
     });
+    /* "Elegir esta" deja elegida esa madera en el configurador */
+    $("#m-pick").addEventListener("click", function () { set("stand", CONFIG.soportes[Math.max(0, cur)].id); });
+    update();
+  })();
+
+  /* ---------------- Entradas rápidas, progreso y puntos de navegación ----------------
+     Todo parte de un estado visible: sin JavaScript la página se ve completa (la clase "js" activa las animaciones). */
+  (function () {
+    var root = document.documentElement, secs = $$("main .sec");
+    /* los títulos entran palabra por palabra */
+    $$(".words").forEach(function (h) {
+      var ws = h.textContent.trim().split(/\s+/);
+      h.setAttribute("aria-label", h.textContent.trim());
+      h.innerHTML = ws.map(function (w, i) { return '<span class="w" aria-hidden="true" style="--i:' + i + '">' + w + "</span>"; }).join(" ");
+      var after = ws.length * 38;
+      Array.prototype.forEach.call(h.parentNode.querySelectorAll(".fly"), function (f, j) { f.style.setProperty("--d", after + j * 60); });
+    });
+    secs.forEach(function (sc) { Array.prototype.forEach.call(sc.querySelectorAll(".pop"), function (el, i) { el.style.setProperty("--i", i); }); });
     var dots = $("#dots");
-    scenes.forEach(function (sc) {
+    secs.forEach(function (sc) {
       var a = document.createElement("a"); a.href = "#" + sc.id; a.setAttribute("aria-label", sc.dataset.nombre);
       a.innerHTML = "<span>" + sc.dataset.nombre + "</span><i></i>"; dots.appendChild(a);
     });
     var links = $$("#dots a");
     root.classList.add("js");
-    if (!("IntersectionObserver" in window)) { scenes.forEach(function (sc) { sc.classList.add("in"); }); }
+    var targets = secs.concat($$(".steps, .benefits"));
+    if (!("IntersectionObserver" in window)) { targets.forEach(function (sc) { sc.classList.add("in"); }); }
     else {
-      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { e.target.classList.toggle("in", e.isIntersecting); }); }, { rootMargin: "-18% 0px -18% 0px" });
-      scenes.forEach(function (sc) { io.observe(sc); });
+      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }); }, { rootMargin: "0px 0px -12% 0px" });
+      targets.forEach(function (sc) { io.observe(sc); });
     }
-    var prog = $("#prog"), ticking = false, cur = -1, clamp = function (v) { return Math.max(0, Math.min(1, v)); };
+    var prog = $("#prog"), ticking = false, cur = -1;
     function update() {
       ticking = false;
       var vh = window.innerHeight, max = root.scrollHeight - vh, y = window.pageYOffset;
       prog.style.setProperty("--prog", max > 0 ? (y / max).toFixed(4) : 0);
       var act = 0;
-      scenes.forEach(function (sc, i) {
-        var r = sc.getBoundingClientRect();
-        if (r.top <= vh * 0.5) act = i;
-        if (REDUCE || r.bottom < -vh || r.top > vh * 2) return;
-        var tall = r.height > vh * 1.15;
-        sc.style.setProperty("--out", tall ? 0 : clamp(-r.top / (vh * 0.75)).toFixed(3));
-        sc.style.setProperty("--in", tall ? 0 : clamp(r.top / vh).toFixed(3));
-      });
+      secs.forEach(function (sc, i) { if (sc.getBoundingClientRect().top <= vh * 0.5) act = i; });
       if (act !== cur) { cur = act; links.forEach(function (a, i) { a.setAttribute("aria-current", String(i === act)); }); }
     }
     function queue() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
