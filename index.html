@@ -415,6 +415,48 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
 .float-bar .social a { width: 46px; height: 46px; background: rgba(20,20,18,.82); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 10px 24px -10px rgba(0,0,0,.6); }
 .float-bar .social svg { width: 21px; height: 21px; }
 @media (max-width: 420px) { .float-bar .social a { width: 42px; height: 42px; } .float-bar .wa-float { width: 52px; height: 52px; } }
+
+/* ---------- Celular ---------- */
+@media (max-width: 899px) {
+  body::after { display: none; }                       /* sin grano: menos trabajo para el celu */
+  .topbar { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(10,10,9,.94); }
+  .portada .demo { height: 50svh; min-height: 300px; }
+  .portada .demo-cap { font-size: .82rem; padding: 6px 12px; max-width: calc(100% - 24px); }
+  .portada-copy { gap: 12px; padding-top: 18px; padding-bottom: 28px; }
+  .portada-copy h1 { font-size: clamp(2rem, 9.4vw, 2.8rem); }
+  .portada-copy .lead { font-size: 1rem; }
+  .eyebrow { font-size: .78rem; }
+  .eyebrow::before { letter-spacing: 1px; margin-right: 6px; }
+  .hero-cta .btn { flex: 1 1 auto; }
+  h2 { font-size: clamp(1.8rem, 8vw, 2.4rem); }
+  .sec { padding-block: 64px; }
+  .modelos { height: 520vh; padding: 0; }
+  .m-ui { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); padding: 0 12px; }
+  .m-name { bottom: 30%; }
+  /* barra flotante compacta: un solo "dock" oscuro */
+  .float-bar { right: 10px; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); gap: 6px; padding: 5px; border-radius: 99px; background: rgba(14,14,12,.9); box-shadow: 0 0 0 1px rgba(255,255,255,.1), 0 12px 30px -10px rgba(0,0,0,.7); }
+  .float-bar .social { gap: 4px; }
+  .float-bar .social a, .float-bar .social a:hover { width: 38px; height: 38px; background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; transform: none; color: var(--ink); }
+  .float-bar .social svg { width: 19px; height: 19px; }
+  .float-bar .wa-float { width: 44px; height: 44px; box-shadow: none; }
+  .float-bar .wa-float svg { width: 24px; height: 24px; }
+  main { padding-bottom: 70px; }
+  /* configurador más compacto */
+  .config { padding: 14px; gap: 14px; }
+  .cart-row { gap: 8px; padding: 5px 5px 5px 10px; }
+  .cart-name { font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .qty button { width: 40px; height: 40px; }
+  .seg button { font-size: .86rem; padding: 8px 2px; }
+  .stand-chip { margin-right: 4px; }
+  .buy-price { font-size: 2.8rem; }
+  .buy .btn { flex: 1 1 100%; }
+  .benefits > div { min-height: 300px; }
+}
+@media (max-width: 360px) { .stand-chip { display: none; } .portada .demo { height: 46svh; } }
+@media (max-width: 899px) {
+  .float-bar { transition: transform .35s cubic-bezier(.2,.9,.3,1.2), opacity .25s; }
+  .js .float-bar:not(.shown) { transform: translateY(140%); opacity: 0; pointer-events: none; }
+}
 </style>
 
 </head>
@@ -1397,6 +1439,13 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     }
     function queue() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
     window.addEventListener("scroll", queue, { passive: true }); window.addEventListener("resize", queue); update();
+  })();
+  /* En el celu, la barra de redes y WhatsApp aparece cuando bajás un poco (así no tapa la portada) */
+  (function () {
+    var bar = document.querySelector(".float-bar"); if (!bar) return;
+    var on = null;
+    function check() { var v = window.pageYOffset > window.innerHeight * 0.45; if (v !== on) { on = v; bar.classList.toggle("shown", v); } }
+    window.addEventListener("scroll", check, { passive: true }); check();
   })();
 })();
 </script>
