@@ -447,7 +447,7 @@ footer { padding-block: 28px 96px; color: var(--muted); font-size: 0.85rem; bord
         <details><summary>¿Vienen listas para usar?</summary><p>Sí. Nos pasás tu negocio en Google Maps y te las entregamos programadas. Las sacás de la bolsa y las ponés en el mostrador.</p></details>
         <details><summary>¿Cuánto salen?</summary><p id="faq-precios">Todas vienen con su soporte. Una tarjeta con soporte sale $650, dos $1.200, tres $1.700, cuatro $2.150 y cinco $2.500 (el pack más elegido). De la sexta a la décima, cada una suma $450, y desde la undécima, $400. Es un pago único.</p></details>
         <details><summary>¿Pueden llevar el logo de mi local?</summary><p>Sí. Por <span data-extra>$100</span> más por soporte grabamos al frente el nombre o el logo de tu local. En <a href="#pedido">Armá tu pedido</a> podés probar cómo queda antes de pedir.</p></details>
-        <details><summary>¿Qué soporte elijo?</summary><p>Los dos son de madera maciza y sin metal, así que no interfieren con el NFC. Bambú: laminado, de veta fina y tono cálido (72 × 72 × 24 mm). Pino: más claro y liviano (76,2 × 85 × 24 mm). Los dos llevan una ranura fina inclinada 10° hacia atrás: la tarjeta queda parada y se ve el 93%. Con la tarjeta puesta miden unos 10 cm de alto y llevan patitas de goma abajo. Lo elegís en <a href="#pedido">Armá tu pedido</a>.</p></details>
+        <details><summary>¿Qué soporte elijo?</summary><p>Los dos son de madera maciza y sin metal, así que no interfieren con el NFC. Bambú: laminado, de veta fina y tono cálido. Pino: más claro y liviano. Los dos miden 72 × 72 × 24 mm y llevan una ranura fina inclinada 10° hacia atrás: la tarjeta queda parada y se ve el 93%. Con la tarjeta puesta miden unos 10 cm de alto y llevan patitas de goma abajo. Lo elegís en <a href="#pedido">Armá tu pedido</a>.</p></details>
         <details><summary>¿Hay que pagar algo por mes?</summary><p>No. Es un pago único. La tarjeta no lleva batería ni necesita mantenimiento.</p></details>
         <details><summary>¿Puedo cambiar el link más adelante?</summary><p>Sí, las tarjetas se pueden reprogramar. Escribinos y lo resolvemos.</p></details>
         <details><summary>¿Cómo es la entrega?</summary><p>La coordinamos por WhatsApp según dónde esté tu local.</p></details>
@@ -506,7 +506,7 @@ var CONFIG = {
     { id: "bambu", nombre: "Bambú", boton: "Bambú", color: "#c99a5b",
       desc: "Taco macizo de bambú laminado, 72 × 72 × 24 mm, con patitas de goma. Veta fina y tono cálido; con la tarjeta mide ~10 cm de alto." },
     { id: "pino", nombre: "Pino", boton: "Pino", color: "#e3b878",
-      desc: "Taco macizo de pino, 76,2 × 85 × 24 mm, con patitas de goma. Más claro y liviano; con la tarjeta mide ~10 cm de alto." }
+      desc: "Taco macizo de pino, 72 × 72 × 24 mm, con patitas de goma. Más claro y liviano; con la tarjeta mide ~10 cm de alto." }
   ]
 };
 /* Recargo por tarjeta según el soporte, sumado al precio de la escala (0 = mismo precio que la escala).
@@ -797,7 +797,7 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0;
        El origen de cada taco es la boca de la ranura; el frente está en z = +ye. */
     var WOODS = {
       bambu: { D: 72, H: 24, W: 72,   ch: 5, chb: 3, ye: 26, tex: "bambu" },
-      pino:  { D: 85, H: 24, W: 76.2, ch: 3, chb: 3, ye: 24, tex: "pino" }
+      pino:  { D: 72, H: 24, W: 72,   ch: 5, chb: 3, ye: 26, tex: "pino" }
     };
     var SL = { prof: 6, slot: 1.1, lean: 10 * Math.PI / 180, feet: 2 };
     function woodGeo(d) {
