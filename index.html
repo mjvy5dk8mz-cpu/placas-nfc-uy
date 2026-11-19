@@ -385,6 +385,10 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
 .demo-cap { font-family: var(--font-display); font-weight: 600; font-size: .98rem; border-radius: 99px; }
 .stage-hint, .stage-tag { font-size: .8rem; border-radius: 99px; }
 .qty output, .contact .num { font-family: var(--font-display); font-weight: 800; }
+
+/* al tocar Bambú / Pino / Quemada se salta directo, con un fundido rápido */
+.m-pin.jump .m-slide { animation: mjump .45s cubic-bezier(.2,.8,.2,1); }
+@keyframes mjump { from { opacity: .2; transform: scale(1.06); } to { opacity: 1; transform: none; } }
 </style>
 
 </head>
@@ -1281,7 +1285,7 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
 
   /* ---------------- Modelos: la sección queda fija y cada madera entra con zoom ---------------- */
   (function () {
-    var sec = $("#modelos"), slides = $$("#modelos .m-slide"), tabs = $$("#m-tabs button"), bar = $("#m-bar");
+    var root = document.documentElement, pin = $("#modelos .m-pin"), sec = $("#modelos"), slides = $$("#modelos .m-slide"), tabs = $$("#m-tabs button"), bar = $("#m-bar");
     var parts = slides.map(function (s) { return { el: s, main: s.querySelector(".m-main"), fl: s.querySelectorAll(".m-fl"), name: s.querySelector(".m-name") }; });
     var cur = -1, ticking = false, clamp = function (v, a, b) { return Math.max(a, Math.min(b, v)); };
     function update() {
@@ -1315,7 +1319,12 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     tabs.forEach(function (b) {
       b.addEventListener("click", function () {
         var k = Number(b.dataset.go), top = sec.getBoundingClientRect().top + window.pageYOffset, span = sec.offsetHeight - window.innerHeight;
-        window.scrollTo({ top: top + span * (k + .55) / 3, behavior: REDUCE ? "auto" : "smooth" });
+        /* salta directo a esa madera (sin pasar por las del medio) y la muestra con un fundido rápido */
+        root.style.scrollBehavior = "auto";
+        window.scrollTo(0, top + span * (k + .55) / 3);
+        root.style.scrollBehavior = "";
+        pin.classList.remove("jump"); void pin.offsetWidth; if (!REDUCE) pin.classList.add("jump");
+        update();
       });
     });
     /* "Elegir esta" deja elegida esa madera en el configurador */
