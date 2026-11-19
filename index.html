@@ -407,6 +407,14 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
 
 .contact-row { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; }
 .contact .num { font-size: clamp(1.3rem, 4vw, 1.8rem); user-select: all; }
+
+/* Barra flotante: redes al lado del botón de WhatsApp */
+.float-bar { position: fixed; z-index: 20; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 8px; }
+.float-bar .wa-float { position: static; }
+.float-bar .social { gap: 8px; }
+.float-bar .social a { width: 46px; height: 46px; background: rgba(20,20,18,.82); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 10px 24px -10px rgba(0,0,0,.6); }
+.float-bar .social svg { width: 21px; height: 21px; }
+@media (max-width: 420px) { .float-bar .social a { width: 42px; height: 42px; } .float-bar .wa-float { width: 52px; height: 52px; } }
 </style>
 
 </head>
@@ -418,7 +426,6 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
     <a href="#pedido">Armá tu pedido</a>
     <a href="#preguntas">Preguntas</a>
   </nav>
-  <a class="btn btn-wa btn-sm" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener">WhatsApp</a>
 </div><div class="prog" id="prog" aria-hidden="true"></div></header>
 <nav class="dots" id="dots" aria-label="Secciones de la página"></nav>
 <main>
@@ -618,8 +625,6 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
       <p class="lead fly">Contanos cuántas placas querés y el nombre de tu local. Te respondemos por WhatsApp.</p>
       <div class="contact-row fly">
         <a class="btn btn-wa" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.200-1.200l-.3-.2-3 .8.8-2.900-.2-.3A8.200 8.200 0 1 1 12 20.200zm4.500-6.100c-.200-.100-1.500-.700-1.700-.800-.200-.100-.400-.100-.600.100l-.800 1c-.100.200-.300.200-.500.100a6.700 6.700 0 0 1-3.300-2.900c-.200-.400.200-.400.700-1.300.100-.200 0-.300 0-.500l-.800-1.900c-.200-.500-.400-.400-.600-.400h-.500c-.200 0-.500.100-.700.300-.900.900-1 2.100-.300 3.400a11 11 0 0 0 4.600 4.300c1.700.700 2.400.800 3.200.700.500-.100 1.500-.600 1.700-1.200.200-.600.200-1.100.100-1.200-.100-.100-.200-.200-.500-.300z"/></svg> Abrir WhatsApp</a>
-        <span class="num" data-wa-num>095 833 281</span>
-        <div class="social"><a data-red="instagram" href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a><a data-red="tiktok" href="https://www.tiktok.com/" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 2h-3.4v13.3a2.9 2.9 0 1 1-2.1-2.8V9a6.3 6.3 0 1 0 5.5 6.3V8.6a7.8 7.8 0 0 0 4.4 1.4V6.6a4.4 4.4 0 0 1-4.4-4.4z"/></svg></a></div>
       </div>
     </div>
     <footer>
@@ -637,9 +642,9 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
 </main>
 
 
-<a class="wa-float" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener" aria-label="Escribirnos por WhatsApp">
+<div class="float-bar"><div class="social"><a data-red="instagram" href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a><a data-red="facebook" href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 22v-8.2h2.8l.4-3.2h-3.2V8.6c0-.9.3-1.6 1.6-1.6h1.7V4.1c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.4H7.3v3.2h2.8V22h3.4z"/></svg></a><a data-red="tiktok" href="https://www.tiktok.com/" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 2h-3.4v13.3a2.9 2.9 0 1 1-2.1-2.8V9a6.3 6.3 0 1 0 5.5 6.3V8.6a7.8 7.8 0 0 0 4.4 1.4V6.6a4.4 4.4 0 0 1-4.4-4.4z"/></svg></a></div><a class="wa-float" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener" aria-label="Escribirnos por WhatsApp">
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.100L2 22l5-1.300A10 10 0 1 0 12 2zm0 18.200c-1.500 0-3-.400-4.200-1.200l-.300-.200-3 .800.800-2.900-.200-.300A8.200 8.200 0 1 1 12 20.200zm4.500-6.100c-.200-.100-1.500-.700-1.700-.800-.200-.100-.400-.100-.600.100l-.800 1c-.100.200-.300.200-.500.100a6.700 6.700 0 0 1-3.300-2.900c-.200-.400.200-.400.700-1.300.100-.200 0-.300 0-.500l-.800-1.900c-.200-.500-.400-.400-.600-.400h-.500c-.200 0-.500.100-.700.300-.900.900-1 2.100-.300 3.400a11 11 0 0 0 4.600 4.300c1.700.700 2.400.800 3.200.700.500-.100 1.500-.600 1.700-1.200.200-.600.200-1.100.100-1.200-.100-.100-.200-.200-.500-.300z"/></svg>
-</a>
+</a></div>
 
 <script>
 /* Cómo está armado este archivo:
@@ -654,6 +659,7 @@ var CONFIG = {
   whatsapp: "59895833281",          // Tu número con código de país, sin + ni espacios
   whatsappVisible: "095 833 281",   // Cómo se muestra en la sección de contacto
   marca: "Placas NFC",              // Nombre que aparece arriba y en el pie
+  facebook: "",                     // Página de Facebook: usuario o link completo (vacío = lleva a facebook.com). TODO: completar
   instagram: "",                    // Usuario de Instagram sin @ (vacío = lleva a instagram.com). TODO: completar
   tiktok: "",                       // Usuario de TikTok sin @ (vacío = lleva a tiktok.com). TODO: completar
   precios: { 1: 650, 2: 1200, 3: 1700, 4: 2150, 5: 2500 },   // Precio total según cantidad (siempre con soportes)
@@ -686,7 +692,7 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
   document.documentElement.lang = "es-UY";
 
   $$("[data-marca]").forEach(function (e) { e.textContent = CONFIG.marca; });
-  $$("[data-red]").forEach(function (a) { var u = (CONFIG[a.dataset.red] || "").replace(/^@/, ""); if (u) a.href = a.dataset.red === "instagram" ? "https://www.instagram.com/" + u + "/" : "https://www.tiktok.com/@" + u; });
+  $$("[data-red]").forEach(function (a) { var u = (CONFIG[a.dataset.red] || "").replace(/^@/, ""); if (u) a.href = /^https?:/.test(u) ? u : a.dataset.red === "instagram" ? "https://www.instagram.com/" + u + "/" : a.dataset.red === "facebook" ? "https://www.facebook.com/" + u : "https://www.tiktok.com/@" + u; });
   $$("[data-wa-num]").forEach(function (e) { e.textContent = CONFIG.whatsappVisible; });
   $$("[data-extra]").forEach(function (e) { e.textContent = pesos(CONFIG.extraLogo); });
   $("#faq-precios").textContent = "Todas vienen con su soporte. Una tarjeta con soporte sale " + pesos(CONFIG.precios[1]) + ", dos " + pesos(CONFIG.precios[2]) + ", tres " + pesos(CONFIG.precios[3])
