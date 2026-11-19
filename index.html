@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="es-UY">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Web de placas NFC</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#11151c">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Placas NFC para reseñas de Google">
+<meta property="og:description" content="Tus clientes acercan el celular y te dejan la reseña. Tarjetas con soporte para mostrador, entregadas programadas en Uruguay.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2311151c'/%3E%3Cpath d='M16 5l3.200 6.900 7.500.900-5.500 5.100 1.500 7.400L16 21.600l-6.700 3.700 1.500-7.400-5.500-5.100 7.500-.900z' fill='%23f6b704'/%3E%3C/svg%3E">
+<meta name="description" content="Placas NFC para que tus clientes dejen una reseña en Google acercando el celular. Tarjetas con soporte para mostrador, entregadas programadas en Uruguay.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+/* Layout: columna única en celular; en escritorio el hero parte en texto + visor 3D con su configurador pegado abajo. */
+:root {
+  --bg: #eef0f4;
+  --surface: #ffffff;
+  --ink: #11151c;
+  --muted: #566072;
+  --line: #d3d9e3;
+  --accent: #1f55e0;
+  --accent-ink: #ffffff;
+  --star: #f6b704;
+  --wa: #128c4a;
+  --wa-ink: #ffffff;
+  --font-display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "DM Sans", "Segoe UI", system-ui, sans-serif;
+  --radius: 18px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1016; --surface: #171b23;
+    --ink: #eef1f6; --muted: #9ba6b8; --line: #2a313d;
+    --accent: #7ea2ff; --accent-ink: #0a1230; --wa: #2fc56f; --wa-ink: #04220f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1016; --surface: #171b23;
+  --ink: #eef1f6; --muted: #9ba6b8; --line: #2a313d;
+  --accent: #7ea2ff; --accent-ink: #0a1230; --wa: #2fc56f; --wa-ink: #04220f;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; line-height: 1.05; }
+h1 { font-size: clamp(2.3rem, 7.2vw, 4.1rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.7rem, 4.6vw, 2.5rem); font-weight: 800; letter-spacing: -0.015em; }
+h3 { font-size: 1.2rem; font-weight: 600; line-height: 1.2; }
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+
+/* Header */
+.head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 16px; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+.brand i { width: 12px; height: 12px; border-radius: 50%; background: var(--star); display: inline-block; }
+.nav { display: flex; gap: 20px; font-size: 0.95rem; }
+.nav a { text-decoration: none; color: var(--muted); font-weight: 500; }
+.nav a:hover { color: var(--ink); }
+@media (max-width: 720px) { .nav { display: none; } }
+
+/* Botones */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  font: inherit; font-weight: 700; text-decoration: none; cursor: pointer;
+  border: 0; border-radius: 999px; padding: 14px 22px; min-height: 50px;
+  transition: transform .15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-wa { background: var(--wa); color: var(--wa-ink); }
+.btn-primary { background: var(--ink); color: var(--bg); }
+.btn-ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line); }
+.btn-sm { padding: 9px 16px; min-height: 40px; font-size: 0.92rem; }
+.btn svg { width: 20px; height: 20px; flex: none; }
+
+/* Hero */
+.hero { display: grid; gap: 28px; padding-block: 12px 56px; align-items: center; }
+.hero-copy { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-size: 0.78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.eyebrow::before { content: "★★★★★"; color: var(--star); letter-spacing: 2px; margin-right: 10px; }
+.lead { font-size: 1.15rem; color: var(--muted); max-width: 34em; }
+.hero-cta { display: flex; flex-wrap: wrap; gap: 10px; }
+.ticks { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--muted); font-size: 0.95rem; }
+.ticks li::before { content: "✓"; color: var(--wa); font-weight: 700; margin-right: 6px; }
+@media (min-width: 900px) {
+  .hero { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 40px; padding-block: 24px 80px; }
+}
+
+/* Animación del celular (un solo look oscuro, colores fijos) */
+.demo { position: relative; height: 540px; border-radius: 26px; overflow: hidden; background: radial-gradient(ellipse at 50% 60%, #232a3a, #0b0d12 70%); color: #ffffff; min-width: 0; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+.demo-card { position: absolute; left: 50%; bottom: 70px; width: 170px; margin-left: -85px; aspect-ratio: 540 / 855; border-radius: 10px; background: #1b1c27 center / cover no-repeat; box-shadow: 0 30px 50px -20px rgba(0,0,0,.8); }
+.demo-phone { position: absolute; left: 50%; top: 50%; width: 130px; margin-left: -65px; aspect-ratio: 9 / 19; border-radius: 26px; background: #1d222c; border: 3px solid #3a4150; box-shadow: 0 30px 60px -10px rgba(0,0,0,.7); display: grid; place-items: center; z-index: 2; transform: translateY(-125%) rotate(-8deg); opacity: 0; transition: transform 1s cubic-bezier(.2,.8,.2,1), opacity .4s; }
+.demo-phone::before { content: ""; position: absolute; top: 8px; width: 34%; height: 12px; background: #0b0d12; border-radius: 999px; }
+.ph-screen { position: relative; width: 84%; height: 66%; border-radius: 14px; background: linear-gradient(160deg, #2b3242, #161a22); display: grid; place-items: center; text-align: center; font-size: .75rem; padding: 6px; transition: background .4s; }
+.ph-idle { opacity: .8; }
+.ph-review { display: none; color: #11151c; gap: 8px; justify-items: center; }
+.ph-review b { font-size: .8rem; }
+.ph-review span { font-size: .68rem; font-weight: 700; color: #128c4a; opacity: 0; }
+.ph-stars { display: flex; gap: 1px; font-size: 1.05rem; line-height: 1; }
+.ph-stars i { font-style: normal; color: #c9ced8; }
+.demo.s-approach .demo-phone { opacity: 1; transform: translateY(-98%) rotate(-6deg); }
+.demo.s-tap .demo-phone { opacity: 1; transform: translateY(-74%) rotate(0deg); }
+.ripple { position: absolute; left: 50%; top: 30%; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; border: 3px solid #7ea2ff; opacity: 0; pointer-events: none; }
+.demo.s-tap .ripple { animation: rip 1.1s ease-out infinite; }
+.demo.s-tap .ripple:nth-child(2) { animation-delay: .35s; }
+.demo.s-tap .ripple:nth-child(3) { animation-delay: .7s; }
+@keyframes rip { from { transform: scale(.6); opacity: .9; } to { transform: scale(4.2); opacity: 0; } }
+.demo-notif { position: absolute; left: 14px; right: 14px; top: 14px; z-index: 4; max-width: 340px; margin-inline: auto; background: #fafafc; color: #11151c; border-radius: 16px; padding: 10px 12px; display: flex; gap: 10px; align-items: center; box-shadow: 0 16px 40px -10px rgba(0,0,0,.5); transform: translateY(-170%); transition: transform .45s cubic-bezier(.2,.8,.2,1); }
+.demo-notif b { display: block; font-size: .9rem; }
+.demo-notif span { font-size: .8rem; color: #566072; }
+.notif-ico { width: 36px; height: 36px; border-radius: 10px; background: #ffffff; display: grid; place-items: center; box-shadow: inset 0 0 0 1px #e1e4ea; flex: none; }
+.demo.s-notif .demo-notif { transform: none; }
+.demo.s-review .ph-screen { background: #f3f4f7; }
+.demo.s-review .ph-idle { display: none; }
+.demo.s-review .ph-review { display: grid; }
+.demo.s-review .ph-stars i { animation: starOn .3s forwards; }
+.demo.s-review .ph-stars i:nth-child(2) { animation-delay: .25s; }
+.demo.s-review .ph-stars i:nth-child(3) { animation-delay: .5s; }
+.demo.s-review .ph-stars i:nth-child(4) { animation-delay: .75s; }
+.demo.s-review .ph-stars i:nth-child(5) { animation-delay: 1s; }
+.demo.s-review .ph-review span { animation: fadeIn .4s 1.5s forwards; }
+@keyframes starOn { to { color: #f6b704; transform: scale(1.15); } }
+@keyframes fadeIn { to { opacity: 1; } }
+.demo-cap { position: absolute; left: 0; right: 0; bottom: 22px; text-align: center; padding-inline: 16px; font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; }
+@media (prefers-reduced-motion: reduce) {
+  .demo-phone, .demo-notif { transition-duration: .01s; }
+  .demo.s-tap .ripple { animation: none; opacity: .5; transform: scale(2); }
+  .demo.s-review .ph-stars i { animation: none; color: #f6b704; }
+  .demo.s-review .ph-review span { animation: none; opacity: 1; }
+}
+
+/* Galería de renders */
+.sec-head-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; max-width: none; }
+.seg-inline { width: 200px; max-width: 100%; }
+.gal { display: grid; grid-auto-flow: column; grid-auto-columns: 78%; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; }
+.gal figure { margin: 0; position: relative; scroll-snap-align: start; min-width: 0; overflow: hidden; border-radius: var(--radius); background: #120b07; }
+.gal img { display: block; width: 100%; height: auto; border-radius: var(--radius); background: #120b07; }
+.gal figcaption { position: absolute; left: 12px; bottom: 12px; background: rgba(11,13,18,.72); color: #ffffff; padding: 4px 12px; border-radius: 999px; font-size: .85rem; font-weight: 700; }
+@media (min-width: 700px) { .gal { grid-auto-flow: row; grid-template-columns: repeat(3, 1fr); overflow: visible; padding-bottom: 0; } }
+
+/* Carrito */
+.cart { display: grid; gap: 8px; }
+.cart-row { display: flex; align-items: center; gap: 12px; background: var(--bg); border-radius: 14px; padding: 8px 8px 8px 14px; }
+.cart-name { flex: 1; min-width: 0; font-weight: 500; }
+.chip { width: 22px; height: 34px; border-radius: 4px; flex: none; box-shadow: inset 0 0 0 1.5px var(--line); }
+.chip-negra { background: #1b1c27; }
+.chip-blanca { background: #f6f6f3; }
+.qty { display: flex; align-items: center; gap: 4px; }
+.qty button { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--surface); color: var(--ink); font: inherit; font-size: 1.4rem; line-height: 1; cursor: pointer; box-shadow: inset 0 0 0 1.5px var(--line); }
+.qty button:disabled { opacity: .35; cursor: default; }
+.qty output { min-width: 2.2em; text-align: center; font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.btn[aria-disabled="true"] { opacity: .45; pointer-events: none; cursor: default; }
+@media (min-width: 900px) {
+  .viewer { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
+  .viewer .stage { aspect-ratio: auto; max-height: none; min-height: 560px; height: 100%; }
+}
+
+/* Visor */
+.viewer { background: var(--surface); border-radius: 26px; overflow: hidden; box-shadow: 0 1px 0 var(--line), 0 24px 60px -30px rgba(10, 20, 50, .35); min-width: 0; }
+.stage {
+  position: relative; aspect-ratio: 1 / 1; max-height: 520px; width: 100%;
+  /* escena fija: mesa de madera con luces cálidas de fondo, igual en tema claro y oscuro */
+  background:
+    radial-gradient(circle at 14% 17%, rgba(255,206,140,.55) 0, rgba(255,206,140,.2) 4%, transparent 7.5%),
+    radial-gradient(circle at 36% 9%, rgba(255,214,160,.45) 0, rgba(255,214,160,.16) 3.5%, transparent 6.5%),
+    radial-gradient(circle at 60% 15%, rgba(255,198,130,.5) 0, rgba(255,198,130,.18) 4.5%, transparent 8%),
+    radial-gradient(circle at 83% 8%, rgba(255,214,160,.45) 0, rgba(255,214,160,.16) 3.5%, transparent 6.5%),
+    linear-gradient(#1f140d, #120b07 50%);
+  touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none;
+}
+.stage:active { cursor: grabbing; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.stage-hint { position: absolute; left: 14px; bottom: 12px; font-size: 0.8rem; color: #e9dccd; background: rgba(18,11,7,.72); padding: 4px 10px; border-radius: 999px; pointer-events: none; }
+.stage-fallback, .stage-loading { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: #e9dccd; }
+.stage-loading { font-size: .95rem; opacity: .8; pointer-events: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.config { padding: 18px; display: grid; gap: 16px; }
+.opt { display: grid; gap: 7px; min-width: 0; }
+.opt-label { font-size: 0.74rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.opt-label b { color: var(--ink); letter-spacing: 0; text-transform: none; font-size: 0.9rem; font-weight: 500; margin-left: 6px; }
+.seg { display: flex; background: var(--bg); border-radius: 12px; padding: 4px; gap: 4px; }
+.seg button {
+  flex: 1; min-width: 0; font: inherit; font-size: 0.95rem; font-weight: 500; color: var(--ink);
+  background: transparent; border: 0; border-radius: 9px; padding: 9px 4px; min-height: 44px; cursor: pointer;
+}
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); font-weight: 700; }
+.swatches { display: flex; flex-wrap: wrap; gap: 10px; }
+.stand-chip { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.25); }
+.swatch { width: 40px; height: 40px; border-radius: 50%; border: 0; padding: 0; cursor: pointer; box-shadow: inset 0 0 0 1.5px var(--line); }
+.swatch[aria-pressed="true"] { outline: 3px solid var(--accent); outline-offset: 3px; }
+.logo-fields { display: grid; gap: 10px; }
+.logo-fields input[type="text"] { font: inherit; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 12px; padding: 11px 14px; width: 100%; min-width: 0; }
+.logo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.logo-thumb { width: 40px; height: 40px; border-radius: 10px; background: var(--bg) center / contain no-repeat; box-shadow: inset 0 0 0 1.5px var(--line); }
+.hint { font-size: 0.85rem; color: var(--muted); }
+.hint .best { color: var(--ink); background: var(--star); padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.buy { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 16px; }
+.buy-price { font-family: var(--font-display); font-weight: 800; font-size: 2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.buy-sub { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+
+/* Secciones */
+section { padding-block: 56px; }
+.sec-head { display: grid; gap: 10px; margin-bottom: 28px; max-width: 40em; }
+.sec-head p { color: var(--muted); }
+.band { background: var(--surface); }
+.tight-top { padding-top: 0; }
+[id] { scroll-margin-top: 16px; }
+
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; counter-reset: paso; }
+.steps li { counter-increment: paso; display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start; }
+.steps li::before {
+  content: counter(paso); font-family: var(--font-display); font-weight: 800; font-size: 1.3rem;
+  width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--ink); color: var(--bg);
+  transform: scale(var(--pop, 1));
+}
+.steps p { color: var(--muted); margin-top: 4px; }
+@media (min-width: 800px) { .steps { grid-template-columns: repeat(3, 1fr); gap: 32px; } .steps li { grid-template-columns: 1fr; } }
+
+.benefits { display: grid; gap: 28px 40px; }
+/* La raya de arriba es un fondo (no un borde) para poder dibujarla con GSAP al hacer scroll */
+.benefits div { padding-top: 16px; background: linear-gradient(var(--ink), var(--ink)) left top / var(--rule, 100%) 2px no-repeat; }
+.benefits p { color: var(--muted); margin-top: 6px; }
+@media (min-width: 700px) { .benefits { grid-template-columns: repeat(2, 1fr); } }
+
+.faq { display: grid; gap: 0; max-width: 46em; }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary { cursor: pointer; list-style: none; padding: 18px 0; font-weight: 700; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font-family: var(--font-display); font-size: 1.4rem; line-height: 1; color: var(--muted); }
+.faq details[open] summary::after { content: "–"; }
+.faq details p { color: var(--muted); padding-bottom: 18px; max-width: 40em; }
+
+.contact { display: grid; gap: 20px; justify-items: start; }
+.contact .num { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.6rem, 6vw, 2.4rem); user-select: all; }
+.foot-nav { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-bottom: 14px; }
+.foot-nav a { color: var(--ink); font-weight: 500; text-decoration: none; }
+.foot-nav a:hover { text-decoration: underline; }
+.faq a { color: var(--accent); }
+.wa-float {
+  position: fixed; z-index: 20; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  width: 56px; height: 56px; border-radius: 50%; background: var(--wa); color: var(--wa-ink); display: grid; place-items: center;
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, .5);
+}
+.wa-float svg { width: 28px; height: 28px; }
+footer { padding-block: 28px 96px; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); }
+
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn { transition: none; } }
+</style>
+
+</head>
+<body>
+<header class="wrap head">
+  <a class="brand" href="#inicio"><i></i><span data-marca>Placas NFC</span></a>
+  <nav class="nav" aria-label="Secciones">
+    <a href="#como-funciona">Cómo funciona</a>
+    <a href="#galeria">Cómo queda</a>
+    <a href="#pedido">Armá tu pedido</a>
+    <a href="#preguntas">Preguntas</a>
+  </nav>
+  <a class="btn btn-wa btn-sm" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener">WhatsApp</a>
+</header>
+
+<main>
+  <div class="wrap hero" id="inicio">
+    <div class="hero-copy">
+      <p class="eyebrow">Placas NFC para locales de Uruguay</p>
+      <h1>Más reseñas en Google con solo acercar el celular</h1>
+      <p class="lead">Ponés la placa en el mostrador o en la mesa. Tu cliente acerca el celular y se le abre la página para dejarte la reseña. Sin apps y sin buscar tu local.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#pedido">Armar mi pedido</a>
+        <a class="btn btn-ghost" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.200-1.200l-.3-.2-3 .8.8-2.900-.2-.3A8.200 8.200 0 1 1 12 20.200zm4.500-6.100c-.200-.100-1.500-.700-1.700-.800-.200-.100-.400-.100-.600.100l-.800 1c-.100.200-.300.200-.500.100a6.700 6.700 0 0 1-3.300-2.900c-.200-.400.200-.400.700-1.300.100-.200 0-.300 0-.500l-.800-1.900c-.200-.500-.400-.400-.600-.400h-.500c-.200 0-.500.100-.700.300-.900.900-1 2.100-.300 3.400a11 11 0 0 0 4.600 4.300c1.700.700 2.400.800 3.200.700.500-.100 1.500-.600 1.700-1.200.200-.600.200-1.100.100-1.200-.100-.100-.200-.200-.500-.300z"/></svg>
+          Consultar por WhatsApp
+        </a>
+      </div>
+      <ul class="ticks">
+        <li>Llegan programadas</li>
+        <li>Pago único</li>
+        <li>iPhone y Android</li>
+      </ul>
+    </div>
+
+    <div class="demo" id="demo" role="img" aria-label="Animación: el cliente acerca el celular a la placa, le salta un aviso y deja su reseña de 5 estrellas.">
+      <div class="demo-notif" aria-hidden="true">
+        <div class="notif-ico"><svg width="22" height="22" viewBox="0 0 48 48" id="notif-g"></svg></div>
+        <div><b>Dejá tu reseña</b><span>Tocá para abrir en Google Maps</span></div>
+      </div>
+      <div class="demo-card" id="demo-card" aria-hidden="true"><span class="ripple"></span><span class="ripple"></span><span class="ripple"></span></div>
+      <div class="demo-phone" aria-hidden="true">
+        <div class="ph-screen">
+          <span class="ph-idle">Celular del cliente</span>
+          <div class="ph-review"><b>¿Cómo te fue?</b><div class="ph-stars"><i>★</i><i>★</i><i>★</i><i>★</i><i>★</i></div><span>¡Reseña publicada!</span></div>
+        </div>
+      </div>
+      <p class="demo-cap" id="demo-cap" aria-hidden="true">El cliente acerca el celular</p>
+    </div>
+  </div>
+
+  <section class="band" id="como-funciona">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Tres pasos y ya estás juntando reseñas</h2>
+      </div>
+      <ol class="steps">
+        <li><div><h3>Nos pasás tu local</h3><p>Nos mandás el nombre o el link de tu negocio en Google Maps y programamos las tarjetas con tu página de reseñas.</p></div></li>
+        <li><div><h3>Las ponés a la vista</h3><p>En el mostrador, la caja o cada mesa. El soporte las deja paradas y mirando al cliente.</p></div></li>
+        <li><div><h3>El cliente acerca el celular</h3><p>Se le abre la pantalla para puntuarte y escribir. Le lleva menos de un minuto mientras espera la cuenta.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="galeria">
+    <div class="wrap">
+      <div class="sec-head sec-head-row">
+        <h2>Así queda en tu local</h2>
+        <div class="seg seg-inline" id="seg-gal" role="group" aria-label="Color de la tarjeta en las fotos">
+          <button type="button" id="gal-negra" data-g="negra" aria-pressed="true">Negra</button>
+          <button type="button" id="gal-blanca" data-g="blanca" aria-pressed="false">Blanca</button>
+        </div>
+      </div>
+      <div class="gal" id="gal" tabindex="0" aria-label="Imágenes de la placa en distintos locales">
+        <figure><img data-local="restaurante" data-alt="en su soporte sobre la mesa de un restaurante, junto a una copa de vino" src="img/restaurante_negra_vertical.jpg" alt="Placa NFC negra en su soporte sobre la mesa de un restaurante, junto a una copa de vino" width="1080" height="1350" loading="lazy"><figcaption>Restaurante</figcaption></figure>
+        <figure><img data-local="cafe" data-alt="en su soporte sobre el mostrador de un café" src="img/cafe_negra_vertical.jpg" alt="Placa NFC negra en su soporte sobre el mostrador de un café" width="1080" height="1350" loading="lazy"><figcaption>Café</figcaption></figure>
+        <figure><img data-local="barberia" data-alt="en su soporte sobre el mostrador de una barbería" src="img/barberia_negra_vertical.jpg" alt="Placa NFC negra en su soporte sobre el mostrador de una barbería" width="1080" height="1350" loading="lazy"><figcaption>Barbería</figcaption></figure>
+        <figure><img src="img/taco_bambu_negra_34.jpg" alt="Tarjeta NFC negra parada en el soporte de bambú, un taco macizo con una ranura fina" width="1080" height="1350" loading="lazy"><figcaption>Soporte de bambú</figcaption></figure>
+        <figure><img src="img/taco_bambu_blanca_34.jpg" alt="Tarjeta NFC blanca parada en el soporte de bambú" width="1080" height="1350" loading="lazy"><figcaption>Bambú con tarjeta blanca</figcaption></figure>
+        <figure><img src="img/taco_bambu_negra_perfil.jpg" alt="Soporte de bambú de perfil: la tarjeta entra apenas en la ranura, inclinada 10 grados hacia atrás" width="1080" height="1350" loading="lazy"><figcaption>Bambú de perfil</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="tight-top" id="pedido">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Armá tu pedido</h2>
+        <p>Elegí cuántas tarjetas querés de cada color y mirá cómo quedan. Cada tarjeta viene con su soporte.</p>
+      </div>
+  <div class="viewer" id="visor">
+    <div class="stage" id="stage" role="img" aria-label="Vista 3D de la tarjeta NFC en su soporte. Arrastrá para girarla.">
+      <div class="stage-loading" id="stage-loading">Cargando la vista 3D…</div>
+      <div class="stage-fallback" id="fallback" hidden>No pudimos cargar la vista 3D en este navegador. Pedinos fotos por WhatsApp.</div>
+      <span class="stage-hint" id="stage-hint">Arrastrá para girar</span>
+    </div>
+    <div class="config">
+      <div class="opt">
+        <span class="opt-label" id="l-cart">Tarjetas</span>
+        <div class="cart" role="group" aria-labelledby="l-cart">
+          <div class="cart-row">
+            <span class="chip chip-negra" aria-hidden="true"></span><span class="cart-name">Negro mate</span>
+            <div class="qty">
+              <button type="button" id="menos-negra" data-q="negra" data-d="-1" aria-label="Quitar una tarjeta negra">−</button>
+              <output id="q-negra" aria-live="polite">2</output>
+              <button type="button" id="mas-negra" data-q="negra" data-d="1" aria-label="Sumar una tarjeta negra">+</button>
+            </div>
+          </div>
+          <div class="cart-row">
+            <span class="chip chip-blanca" aria-hidden="true"></span><span class="cart-name">Blanco mate</span>
+            <div class="qty">
+              <button type="button" id="menos-blanca" data-q="blanca" data-d="-1" aria-label="Quitar una tarjeta blanca">−</button>
+              <output id="q-blanca" aria-live="polite">1</output>
+              <button type="button" id="mas-blanca" data-q="blanca" data-d="1" aria-label="Sumar una tarjeta blanca">+</button>
+            </div>
+          </div>
+        </div>
+        <p class="hint" id="tiers">1 con soporte $650 · 2 por $1.200 · 3 por $1.700 · 4 por $2.150 · <b class="best">5 por $2.500 ★ Más elegido</b> · de la 6 a la 10, +$450 c/u · desde la 11, +$400 c/u.</p>
+      </div>
+      <div class="opt" id="opt-stand">
+        <span class="opt-label" id="l-stand">Soporte <b id="stand-name"></b></span>
+        <div class="seg" id="swatches" role="group" aria-labelledby="l-stand"></div>
+        <p class="hint" id="stand-desc"></p>
+      </div>
+      <div class="opt" id="opt-logo">
+        <span class="opt-label" id="l-logo">Grabado en el soporte</span>
+        <div class="seg" id="seg-logo" role="group" aria-labelledby="l-logo">
+          <button type="button" id="logo-no" data-l="0" aria-pressed="true">Sin grabado</button>
+          <button type="button" id="logo-si" data-l="1" aria-pressed="false">Con tu logo +<span data-extra></span></button>
+        </div>
+        <div class="logo-fields" id="logo-fields" hidden>
+          <input id="in-name" type="text" maxlength="28" placeholder="Nombre de tu local" aria-label="Nombre de tu local" autocomplete="organization">
+          <div class="logo-row">
+            <span class="logo-thumb" id="logo-thumb" hidden></span>
+            <label class="btn btn-ghost btn-sm" for="in-logo" id="logo-btn">Subir logo</label>
+            <input id="in-logo" type="file" accept="image/*" hidden>
+            <button type="button" class="btn btn-ghost btn-sm" id="logo-del" hidden>Quitar</button>
+          </div>
+          <p class="hint">Va grabado en la parte de atrás del soporte, y el visor gira para mostrártelo. La imagen no se sube a ningún lado: después nos la mandás por WhatsApp.</p>
+        </div>
+      </div>
+      <noscript><p class="hint">Para armar el pedido acá necesitás tener JavaScript activado. Si no, escribinos por WhatsApp y te pasamos precio y fotos.</p></noscript>
+      <div class="buy">
+        <div>
+          <div class="buy-price" id="price" aria-hidden="true">$1.700</div>
+          <div class="buy-sub" id="price-sub">3 tarjetas con sus 3 soportes</div>
+          <span class="sr-only" id="price-live" aria-live="polite"></span>
+        </div>
+        <a class="btn btn-wa" data-wa="config" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener" id="buy-btn">Pedir por WhatsApp</a>
+      </div>
+    </div>
+  </div>
+    </div>
+  </section>
+
+  <section class="band" id="beneficios">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Por qué le sirve a tu local</h2>
+        <p>Muchos clientes conformes no dejan reseña porque se olvidan o les da pereza buscarte. La placa les saca ese trabajo.</p>
+      </div>
+      <div class="benefits">
+        <div><h3>Pedís la reseña en el mejor momento</h3><p>Cuando el cliente todavía está en el local y contento con el servicio, no tres días después.</p></div>
+        <div><h3>Más visibilidad en Google Maps</h3><p>Google tiene en cuenta la cantidad de reseñas y su puntaje para decidir qué negocios mostrar cuando alguien busca en la zona.</p></div>
+        <div><h3>No dependés de nadie</h3><p>No hay app, cuenta ni mensualidad. La tarjeta no usa batería ni internet propio.</p></div>
+        <div><h3>Queda prolija en el mostrador</h3><p>Tarjeta mate de 85,5 × 54 mm, del tamaño de una tarjeta de crédito, en soporte de acrílico negro mate o de bambú.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="preguntas">
+    <div class="wrap">
+      <div class="sec-head"><h2>Preguntas frecuentes</h2></div>
+      <div class="faq">
+        <details open><summary>¿El cliente tiene que bajar una app?</summary><p>No. Acerca el celular a la tarjeta y le aparece un aviso que abre directo la página de reseñas de tu local.</p></details>
+        <details><summary>¿Funciona con cualquier celular?</summary><p>Con los iPhone desde el XS en adelante y con casi todos los Android que tienen NFC, que es lo mismo que se usa para pagar con el celular.</p></details>
+        <details><summary>¿Vienen listas para usar?</summary><p>Sí. Nos pasás tu negocio en Google Maps y te las entregamos programadas. Las sacás de la bolsa y las ponés en el mostrador.</p></details>
+        <details><summary>¿Cuánto salen?</summary><p id="faq-precios">Todas vienen con su soporte. Una tarjeta con soporte sale $650, dos $1.200, tres $1.700, cuatro $2.150 y cinco $2.500 (el pack más elegido). De la sexta a la décima, cada una suma $450, y desde la undécima, $400. Es un pago único.</p></details>
+        <details><summary>¿Pueden llevar el logo de mi local?</summary><p>Sí. Por <span data-extra>$100</span> más por soporte grabamos el nombre o el logo de tu local. En <a href="#pedido">Armá tu pedido</a> podés probar cómo queda antes de pedir.</p></details>
+        <details><summary>¿Qué soporte elijo?</summary><p>Acrílico negro mate, moderno; o bambú, natural y cálido. El de bambú es un taco macizo de bambú laminado de 72 × 72 × 24 mm con una ranura fina inclinada 10° hacia atrás: la tarjeta queda parada y se ve el 93%. Con la tarjeta puesta mide unos 10 cm de alto y lleva patitas de goma abajo. Ninguno de los dos tiene metal, así que no interfieren con el NFC. Lo elegís en <a href="#pedido">Armá tu pedido</a>.</p></details>
+        <details><summary>¿Hay que pagar algo por mes?</summary><p>No. Es un pago único. La tarjeta no lleva batería ni necesita mantenimiento.</p></details>
+        <details><summary>¿Puedo cambiar el link más adelante?</summary><p>Sí, las tarjetas se pueden reprogramar. Escribinos y lo resolvemos.</p></details>
+        <details><summary>¿Cómo es la entrega?</summary><p>La coordinamos por WhatsApp según dónde esté tu local.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="contacto">
+    <div class="wrap contact">
+      <h2>Escribinos y te las armamos</h2>
+      <p class="lead">Contanos cuántas placas querés y el nombre de tu local. Te respondemos por WhatsApp.</p>
+      <div class="num" data-wa-num>095 833 281</div>
+      <a class="btn btn-wa" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener">Abrir WhatsApp</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <nav class="foot-nav" aria-label="Pie de página">
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#galeria">Cómo queda</a>
+      <a href="#pedido">Armá tu pedido</a>
+      <a href="#preguntas">Preguntas</a>
+      <a data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener">WhatsApp</a>
+    </nav>
+    <p><span data-marca>Placas NFC</span> · Montevideo, Uruguay. Google y el logo de Google son marcas de Google LLC; este sitio no está afiliado a Google.</p>
+  </div>
+</footer>
+
+<a class="wa-float" data-wa="general" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener" aria-label="Escribirnos por WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.100L2 22l5-1.300A10 10 0 1 0 12 2zm0 18.200c-1.500 0-3-.400-4.200-1.200l-.300-.200-3 .800.800-2.900-.200-.300A8.200 8.200 0 1 1 12 20.200zm4.500-6.100c-.200-.100-1.500-.700-1.700-.800-.200-.100-.400-.100-.600.100l-.800 1c-.100.200-.300.200-.500.100a6.700 6.700 0 0 1-3.300-2.900c-.200-.400.200-.400.700-1.300.100-.200 0-.300 0-.500l-.800-1.900c-.200-.500-.400-.400-.600-.400h-.500c-.200 0-.500.100-.700.300-.900.900-1 2.100-.300 3.400a11 11 0 0 0 4.600 4.300c1.700.700 2.400.800 3.200.700.500-.100 1.500-.600 1.700-1.200.200-.600.200-1.100.100-1.200-.100-.100-.200-.200-.500-.300z"/></svg>
+</a>
+
+<!-- GSAP para las animaciones con scroll. Three.js y el modelo del soporte se cargan después, recién cuando el visor se acerca a la pantalla. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+/* Cómo está armado este archivo:
+   1. CONFIGURACIÓN: los datos que podés cambiar (WhatsApp, marca, precios, colores).
+   2. Carrito: cantidades, total y mensaje de WhatsApp.
+   3. Dibujo de la tarjeta y animación del celular del principio.
+   4. Visor 3D (Three.js): tarjetas, soporte, mesa y luces. */
+/* =====================================================================
+   CONFIGURACIÓN: cambiá estos datos y listo.
+   ===================================================================== */
+var CONFIG = {
+  whatsapp: "59895833281",          // Tu número con código de país, sin + ni espacios
+  whatsappVisible: "095 833 281",   // Cómo se muestra en la sección de contacto
+  marca: "Placas NFC",              // Nombre que aparece arriba y en el pie
+  precios: { 1: 650, 2: 1200, 3: 1700, 4: 2150, 5: 2500 },   // Precio total según cantidad (siempre con soportes)
+  precioExtra: 450,                 // Cada tarjeta con soporte de la 6 a la 10
+  precioExtra10: 400,               // Cada tarjeta con soporte desde la 11 en adelante
+  extraLogo: 100,                   // Recargo por soporte con el logo o nombre del local
+  soportes: [                       // Soportes que ofrecés (el primero es el que viene elegido)
+    { id: "acrilico", nombre: "Acrílico negro mate", boton: "Acrílico negro", color: "#1d1f23",
+      desc: "Acrílico negro mate de 3 mm, moderno. La tarjeta queda inclinada y a la vista." },
+    { id: "bambu", nombre: "Bambú", boton: "Bambú", color: "#c99a5b",
+      desc: "Taco macizo de bambú laminado, 72 × 72 × 24 mm, con patitas de goma. Natural y cálido; con la tarjeta mide ~10 cm de alto." }
+  ]
+};
+/* Recargo por tarjeta si elige el soporte de bambú, sumado al precio de la escala (0 = mismo precio que el acrílico).
+   TODO: definir el precio del soporte de bambú. Por ahora sale lo mismo que el soporte actual de acrílico. */
+var PRECIO_BAMBU = 0;
+/* ===================================================================== */
+
+(function () {
+  var state = { q: { negra: 2, blanca: 1 }, stand: CONFIG.soportes[0].id, logo: false, name: "", img: null };
+  var $ = function (s) { return document.querySelector(s); };
+  var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+  var pesos = function (v) { return "$" + String(v).replace(/\B(?=(\d{3})+(?!\d))/g, "."); };
+  var standOf = function () { return CONFIG.soportes.filter(function (s) { return s.id === state.stand; })[0]; };
+  var count = function () { return state.q.negra + state.q.blanca; };
+  var MAX_SHOWN = 12;
+  var REDUCE = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+  var HAS_GSAP = !!window.gsap;
+  document.documentElement.lang = "es-UY";
+
+  $$("[data-marca]").forEach(function (e) { e.textContent = CONFIG.marca; });
+  $$("[data-wa-num]").forEach(function (e) { e.textContent = CONFIG.whatsappVisible; });
+  $$("[data-extra]").forEach(function (e) { e.textContent = pesos(CONFIG.extraLogo); });
+  $("#faq-precios").textContent = "Todas vienen con su soporte. Una tarjeta con soporte sale " + pesos(CONFIG.precios[1]) + ", dos " + pesos(CONFIG.precios[2]) + ", tres " + pesos(CONFIG.precios[3])
+    + ", cuatro " + pesos(CONFIG.precios[4]) + " y cinco " + pesos(CONFIG.precios[5]) + " (el pack más elegido). De la sexta a la décima, cada una suma " + pesos(CONFIG.precioExtra)
+    + ", y desde la undécima, " + pesos(CONFIG.precioExtra10) + ". Es un pago único.";
+  $("#tiers").innerHTML = "1 con soporte " + pesos(CONFIG.precios[1]) + " · 2 por " + pesos(CONFIG.precios[2]) + " · 3 por " + pesos(CONFIG.precios[3])
+    + " · 4 por " + pesos(CONFIG.precios[4]) + " · <b class=\"best\">5 por " + pesos(CONFIG.precios[5]) + " ★ Más elegido</b> · de la 6 a la 10, +" + pesos(CONFIG.precioExtra)
+    + " c/u · desde la 11, +" + pesos(CONFIG.precioExtra10) + " c/u.";
+
+  function withLogo() { return state.logo && count() >= 1; }
+  function base(n) { return n === 0 ? 0 : n <= 5 ? CONFIG.precios[n] : n <= 10 ? CONFIG.precios[5] + (n - 5) * CONFIG.precioExtra : CONFIG.precios[5] + 5 * CONFIG.precioExtra + (n - 10) * CONFIG.precioExtra10; }
+  function extraStand(n) { return state.stand === "bambu" ? PRECIO_BAMBU * n : 0; }
+  function total() { var n = count(); return base(n) + extraStand(n) + (withLogo() ? CONFIG.extraLogo * n : 0); }
+  function cardsText() {
+    var a = [];
+    if (state.q.negra) a.push(state.q.negra + " negro mate");
+    if (state.q.blanca) a.push(state.q.blanca + " blanco mate");
+    return a.join(" y ");
+  }
+  function describe() {
+    var n = count(), t = n + (n === 1 ? " tarjeta" : " tarjetas") + " (" + cardsText() + ")";
+    t += ", con soporte de " + standOf().nombre.toLowerCase() + (n === 1 ? "" : " para todas (" + n + " soportes)");
+    if (withLogo()) {
+      t += ", con el " + (state.img ? "logo" : "nombre") + " de mi local grabado en los soportes";
+      if (state.name.trim()) t += ". Local: " + state.name.trim();
+      if (state.img) t += ". Te mando el logo por acá";
+    }
+    return t + ". Total: " + pesos(total());
+  }
+  function waLink(kind) {
+    var msg = (kind === "general" || !count())
+      ? "Hola! Quiero saber más sobre las placas NFC para reseñas de Google."
+      : "Hola! Quiero pedir " + describe();
+    return "https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(msg);
+  }
+  /* El total cuenta hasta el nuevo valor; los lectores de pantalla reciben solo el valor final */
+  var pricePx = { v: null };
+  function showPrice(v) {
+    var el = $("#price");
+    if (pricePx.v === null || REDUCE || !HAS_GSAP) { pricePx.v = v; el.textContent = pesos(v); return; }
+    gsap.to(pricePx, { v: v, duration: 0.55, ease: "power2.out", overwrite: true,
+      onUpdate: function () { el.textContent = pesos(Math.round(pricePx.v)); } });
+  }
+  function refreshUI() {
+    var n = count();
+    $("#q-negra").textContent = state.q.negra; $("#q-blanca").textContent = state.q.blanca;
+    $("#menos-negra").disabled = !state.q.negra; $("#menos-blanca").disabled = !state.q.blanca;
+    showPrice(total());
+    $("#price-sub").textContent = n === 0 ? "Sumá tarjetas con el + para armar tu pedido"
+      : (n === 1 ? "1 tarjeta con su soporte" : n + " tarjetas con sus " + n + " soportes") + (state.stand === "bambu" ? " de bambú" : "") + (n === 5 ? " · Más elegido" : "")
+        + (state.logo || extraStand(n) ? " (" + pesos(base(n)) + (extraStand(n) ? " + bambú " + pesos(extraStand(n)) : "") + (state.logo ? " + logo " + pesos(CONFIG.extraLogo * n) : "") + ")" : "");
+    $("#price-live").textContent = "Total " + pesos(total()) + ". " + $("#price-sub").textContent;
+    $("#buy-btn").setAttribute("aria-disabled", String(n === 0));
+    $("#stage-hint").textContent = "Arrastrá para girar" + (n > MAX_SHOWN ? " · se muestran " + MAX_SHOWN + " de " + n : "");
+    $("#stand-name").textContent = standOf().nombre;
+    $("#stand-desc").textContent = standOf().desc;
+    $("#opt-stand").hidden = $("#opt-logo").hidden = n === 0;
+    $("#logo-fields").hidden = !state.logo;
+    $$("#swatches button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.s === state.stand)); });
+    $$("#seg-logo button").forEach(function (b) { b.setAttribute("aria-pressed", String((b.dataset.l === "1") === state.logo)); });
+    $("#logo-thumb").hidden = $("#logo-del").hidden = !state.img;
+    $("#logo-thumb").style.backgroundImage = state.img ? "url(" + state.img.src + ")" : "";
+    $("#logo-btn").textContent = state.img ? "Cambiar logo" : "Subir logo";
+    $$("[data-wa]").forEach(function (a) { a.href = waLink(a.dataset.wa); });
+    /* Sin tarjetas, el botón de pedir deja de ser un link (así tampoco se activa con el teclado) */
+    if (n === 0) $("#buy-btn").removeAttribute("href");
+  }
+  function set(key, val) { state[key] = val; refreshUI(); viewer.rebuild(false); if (key === "logo") viewer.look(val); }
+
+  /* Galería: cambia entre las fotos con tarjeta negra y blanca */
+  $("#seg-gal").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    $$("#seg-gal button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    $$("#gal img[data-local]").forEach(function (im) {
+      im.src = "img/" + im.dataset.local + "_" + b.dataset.g + "_vertical.jpg";
+      im.alt = "Placa NFC " + b.dataset.g + " " + im.dataset.alt;
+    });
+  });
+
+  CONFIG.soportes.forEach(function (s) {
+    var b = document.createElement("button");
+    b.type = "button"; b.id = "sop-" + s.id; b.dataset.s = s.id;
+    b.innerHTML = '<span class="stand-chip" aria-hidden="true"></span>'; b.firstChild.style.background = s.color;
+    b.appendChild(document.createTextNode(s.boton)); b.setAttribute("aria-label", "Soporte de " + s.nombre.toLowerCase());
+    b.addEventListener("click", function () { set("stand", s.id); });
+    $("#swatches").appendChild(b);
+  });
+  $$(".qty button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var k = b.dataset.q; state.q[k] = Math.max(0, Math.min(999, state.q[k] + Number(b.dataset.d)));
+      refreshUI(); viewer.rebuild(true);
+    });
+  });
+  $("#seg-logo").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) set("logo", b.dataset.l === "1"); });
+  var nameTimer;
+  $("#in-name").addEventListener("input", function (e) {
+    state.name = e.target.value; refreshUI();
+    clearTimeout(nameTimer); nameTimer = setTimeout(function () { viewer.rebuild(false); }, 120);
+  });
+  $("#in-name").addEventListener("keydown", function (e) { if (e.key === "Enter") e.target.blur(); });
+  $("#in-logo").addEventListener("change", function (e) {
+    var f = e.target.files && e.target.files[0]; if (!f) return;
+    var r = new FileReader();
+    r.onload = function () {
+      var img = new Image();
+      img.onload = function () {
+        /* la achicamos a 512 px para que ande liviano */
+        var k = Math.min(1, 512 / Math.max(img.width, img.height)), c = document.createElement("canvas");
+        c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        var small = new Image();
+        small.onload = function () { set("img", small); };
+        small.src = c.toDataURL("image/png");
+      };
+      img.src = r.result;
+    };
+    r.readAsDataURL(f); e.target.value = "";
+  });
+  $("#logo-del").addEventListener("click", function () { set("img", null); });
+
+  /* ---------------- Dibujo de la tarjeta (se usa en el visor y en la animación) ---------------- */
+    var G_PATHS = [
+      ["#EA4335", "M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"],
+      ["#4285F4", "M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"],
+      ["#FBBC05", "M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"],
+      ["#34A853", "M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"]
+    ];
+    function drawCard(kind) {
+      var c = document.createElement("canvas"); c.width = 1080; c.height = 1712;
+      var g = c.getContext("2d"); g.scale(2, 2);
+      var dark = kind === "negra", ink = dark ? "#ffffff" : "#1f2024";
+      g.fillStyle = dark ? "#1b1c27" : "#f6f6f3"; g.fillRect(0, 0, 540, 856);
+      /* wifi */
+      g.strokeStyle = ink; g.fillStyle = ink; g.lineWidth = 22; g.lineCap = "round";
+      [46, 82, 118].forEach(function (r) { g.beginPath(); g.arc(270, 190, r, Math.PI * 1.25, Math.PI * 1.75); g.stroke(); });
+      g.beginPath(); g.arc(270, 190, 15, 0, Math.PI * 2); g.fill();
+      /* G */
+      g.save(); g.translate(145, 252); g.scale(250 / 48, 250 / 48);
+      G_PATHS.forEach(function (p) { g.fillStyle = p[0]; g.fill(new Path2D(p[1])); });
+      g.restore();
+      /* estrellas */
+      g.fillStyle = "#f6b704";
+      for (var s = 0; s < 5; s++) {
+        var cx = 270 + (s - 2) * 62, cy = 568; g.beginPath();
+        for (var k = 0; k < 10; k++) {
+          var a = -Math.PI / 2 + k * Math.PI / 5, r = k % 2 ? 11.5 : 27;
+          g.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+        }
+        g.closePath(); g.fill();
+      }
+      /* texto */
+      g.textBaseline = "alphabetic"; g.font = '500 80px "DM Sans", Arial, sans-serif';
+      g.fillStyle = ink; g.textAlign = "center"; g.fillText("Review us", 270, 690);
+      var parts = [["on ", ink], ["G", "#4285F4"], ["o", "#EA4335"], ["o", "#FBBC05"], ["g", "#4285F4"], ["l", "#34A853"], ["e", "#EA4335"]];
+      var total = parts.reduce(function (t, p) { return t + g.measureText(p[0]).width; }, 0), x = 270 - total / 2;
+      g.textAlign = "left";
+      parts.forEach(function (p) { g.fillStyle = p[1]; g.fillText(p[0], x, 778); x += g.measureText(p[0]).width; });
+      return c;
+    }
+
+  /* ---------------- Animación del celular ---------------- */
+  (function () {
+    var demo = $("#demo"), cap = $("#demo-cap"), timers = [], running = false;
+    $("#notif-g").innerHTML = G_PATHS.map(function (p) { return '<path fill="' + p[0] + '" d="' + p[1] + '"/>'; }).join("");
+    function paintCard() { try { $("#demo-card").style.backgroundImage = "url(" + drawCard("negra").toDataURL("image/png") + ")"; } catch (e) {} }
+    paintCard();
+    if (document.fonts && document.fonts.load) document.fonts.load('500 80px "DM Sans"').then(paintCard).catch(function () {});
+    var STEPS = [
+      [0, "s-approach", "El cliente acerca el celular"],
+      [1400, "s-tap", "La placa lo detecta al instante"],
+      [2600, "s-tap s-notif", "Le salta el aviso, sin bajar ninguna app"],
+      [4200, "s-tap s-review", "Y te deja la reseña en Google"],
+      [7600, "", "El cliente acerca el celular"]
+    ];
+    function stop() { timers.forEach(clearTimeout); timers = []; running = false; }
+    function play() {
+      stop(); running = true;
+      STEPS.forEach(function (st) { timers.push(setTimeout(function () { demo.className = "demo " + st[1]; cap.textContent = st[2]; }, st[0] + 300)); });
+      timers.push(setTimeout(play, 8500));
+    }
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      demo.className = "demo s-tap s-notif"; cap.textContent = "El cliente acerca el celular y le salta el aviso"; return;
+    }
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (e) { if (e[0].isIntersecting) { if (!running) play(); } else stop(); }).observe(demo);
+    } else play();
+  })();
+
+  /* ---------------- Visor 3D (Three.js). Unidades en milímetros. ---------------- */
+  var viewer = { rebuild: function () {}, look: function () {}, intro: function () {} };
+  var stage = $("#stage");
+
+  function initViewer() {
+    var CW = 54, CH = 85.5, CT = 0.8, LEAN = 18 * Math.PI / 180;
+    var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    stage.insertBefore(renderer.domElement, stage.firstChild);
+
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(28, 1, 10, 4000);
+    scene.fog = new THREE.Fog(0x120b07, 400, 1200);
+    scene.add(new THREE.HemisphereLight(0xffe8d0, 0x2a1a10, 0.6));
+    var key = new THREE.DirectionalLight(0xffdcb4, 0.95);
+    key.position.set(120, 260, 220); key.castShadow = true;
+    key.shadow.mapSize.set(2048, 2048);
+    var sc = key.shadow.camera; sc.left = -260; sc.right = 260; sc.top = 260; sc.bottom = -260; sc.near = 10; sc.far = 900;
+    key.shadow.radius = 6; key.shadow.bias = -0.0005;
+    scene.add(key);
+    var fill = new THREE.DirectionalLight(0xbfd0ff, 0.18); fill.position.set(-200, 80, 160); scene.add(fill);
+    var rim = new THREE.DirectionalLight(0xffc890, 0.55); rim.position.set(-180, 140, -220); scene.add(rim);
+    /* Mesa de madera: veta dibujada en un canvas */
+    function drawWood() {
+      var c = document.createElement("canvas"); c.width = c.height = 1024;
+      var g = c.getContext("2d"), seed = 7;
+      function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+      g.fillStyle = "#4b2a16"; g.fillRect(0, 0, 1024, 1024);
+      for (var i = 0; i < 260; i++) {
+        var y = rnd() * 1024, amp = 2 + rnd() * 6, ph = rnd() * 6.3, dark = rnd() < 0.6;
+        g.strokeStyle = dark ? "rgba(30,14,6," + (0.15 + rnd() * 0.4) + ")" : "rgba(150,96,56," + (0.1 + rnd() * 0.3) + ")";
+        g.lineWidth = 1 + rnd() * 5; g.beginPath();
+        for (var x = 0; x <= 1024; x += 32) g.lineTo(x, y + Math.sin(x / 1024 * Math.PI * 2 + ph) * amp);
+        g.stroke();
+      }
+      return c;
+    }
+    var wood = new THREE.CanvasTexture(drawWood());
+    wood.encoding = THREE.sRGBEncoding; wood.wrapS = wood.wrapT = THREE.MirroredRepeatWrapping; wood.repeat.set(7, 7);
+    wood.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    var floor = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshStandardMaterial({ map: wood, roughness: 0.5, metalness: 0 }));
+    floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+
+    /* Tarjeta: rectángulo redondeado extruido + cara impresa */
+    function roundRect(w, h, r) {
+      var s = new THREE.Shape(), x = -w / 2;
+      s.moveTo(x + r, 0); s.lineTo(x + w - r, 0); s.quadraticCurveTo(x + w, 0, x + w, r);
+      s.lineTo(x + w, h - r); s.quadraticCurveTo(x + w, h, x + w - r, h);
+      s.lineTo(x + r, h); s.quadraticCurveTo(x, h, x, h - r);
+      s.lineTo(x, r); s.quadraticCurveTo(x, 0, x + r, 0);
+      return s;
+    }
+    var cardShape = roundRect(CW, CH, 3.2);
+    var cardBody = new THREE.ExtrudeGeometry(cardShape, { depth: CT, bevelEnabled: false, curveSegments: 10 });
+    cardBody.translate(0, 0, -CT / 2);
+    var cardFace = new THREE.ShapeGeometry(cardShape, 10);
+    var uv = cardFace.attributes.uv, pos = cardFace.attributes.position;
+    for (var i = 0; i < uv.count; i++) uv.setXY(i, (pos.getX(i) + CW / 2) / CW, pos.getY(i) / CH);
+    cardFace.translate(0, 0, CT / 2 + 0.03);
+
+    var cardMats = {};
+    ["negra", "blanca"].forEach(function (k) {
+      var tex = new THREE.CanvasTexture(drawCard(k));
+      tex.encoding = THREE.sRGBEncoding; tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      cardMats[k] = {
+        tex: tex,
+        face: new THREE.MeshStandardMaterial({ map: tex, roughness: 0.85, metalness: 0 }),
+        body: new THREE.MeshStandardMaterial({ color: new THREE.Color(k === "negra" ? 0x1b1c27 : 0xf6f6f3).convertSRGBToLinear(), roughness: 0.85 })
+      };
+    });
+    if (document.fonts && document.fonts.load) {
+      document.fonts.load('500 80px "DM Sans"').then(function () {
+        ["negra", "blanca"].forEach(function (k) { cardMats[k].tex.image = drawCard(k); cardMats[k].tex.needsUpdate = true; });
+      }).catch(function () {});
+    }
+    function makeCard(kind) {
+      var grp = new THREE.Group(), m = cardMats[kind];
+      var body = new THREE.Mesh(cardBody, m.body); body.castShadow = true;
+      grp.add(body); grp.add(new THREE.Mesh(cardFace, m.face));
+      return grp;
+    }
+
+    /* Soporte real de corte láser (el mismo modelo de las fotos), leído del STL de soporte.js */
+    function stlGeometry(b64) {
+      var bin = atob(b64), buf = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+      var dv = new DataView(buf.buffer), tris = dv.getUint32(80, true), pos = new Float32Array(tris * 9);
+      for (var t = 0; t < tris; t++) for (var v = 0; v < 3; v++) {
+        var o = 84 + t * 50 + 12 + v * 12, k = t * 9 + v * 3;
+        pos[k] = dv.getFloat32(o, true); pos[k + 1] = dv.getFloat32(o + 8, true); pos[k + 2] = -dv.getFloat32(o + 4, true);
+      }
+      var geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.BufferAttribute(pos, 3)); geo.computeVertexNormals();
+      return geo;
+    }
+    var standGeo = stlGeometry(window.SOPORTE_STL);
+
+    /* Taco de bambú: perfil real (72 x 72 x 24 mm, ranura de 6 mm a 10°, boca a 26 mm del frente,
+       chaflán 5 adelante y 3 atrás) extruido a lo ancho, sobre 4 patitas de goma de 2 mm */
+    var B = { D: 72, H: 24, W: 72, ch: 5, chb: 3, ye: 26, prof: 6, slot: 1.1, lean: 10 * Math.PI / 180, feet: 2 };
+    var bambooGeo = (function () {
+      var a = B.lean, sx = Math.sin(a), cz = Math.cos(a), nx = Math.cos(a), nz = -Math.sin(a);
+      var Pc = [B.ye - B.prof * sx, B.H - B.prof * cz], w2 = B.slot / 2;
+      var pts = [[0, 0], [B.D, 0], [B.D, B.H - B.chb], [B.D - B.chb, B.H], [B.ye + w2 / cz, B.H],
+        [Pc[0] + nx * w2, Pc[1] + nz * w2], [Pc[0] - nx * w2, Pc[1] - nz * w2], [B.ye - w2 / cz, B.H], [B.ch, B.H], [0, B.H - B.ch]];
+      /* u = profundidad (frente hacia +z), v = alto */
+      var sh = new THREE.Shape(pts.map(function (p) { return new THREE.Vector2(B.ye - p[0], p[1]); }).reverse());
+      var g = new THREE.ExtrudeGeometry(sh, { depth: B.W, bevelEnabled: false });
+      g.rotateY(-Math.PI / 2); g.translate(B.W / 2, B.feet, 0); g.computeVertexNormals();
+      return g;
+    })();
+    function drawBamboo() {
+      var c = document.createElement("canvas"); c.width = c.height = 512;
+      var g = c.getContext("2d"), seed = 11, x = 0;
+      function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+      while (x < 512) {   /* listones del laminado, de tonos apenas distintos */
+        var w = 40 + rnd() * 34, l = 58 + rnd() * 10;
+        g.fillStyle = "hsl(" + (31 + rnd() * 5) + ", " + (48 + rnd() * 12) + "%, " + l + "%)"; g.fillRect(x, 0, w, 512);
+        g.fillStyle = "rgba(90,55,25,.35)"; g.fillRect(x, 0, 1.5, 512);
+        for (var k = 0; k < 9; k++) {   /* fibras */
+          var fx = x + rnd() * w; g.strokeStyle = "rgba(110,70,35," + (0.08 + rnd() * 0.18) + ")"; g.lineWidth = 0.6 + rnd() * 1.4;
+          g.beginPath(); g.moveTo(fx, 0); g.lineTo(fx + (rnd() - 0.5) * 6, 512); g.stroke();
+        }
+        if (rnd() < 0.7) { g.fillStyle = "rgba(95,60,28,.28)"; g.fillRect(x, rnd() * 512, w, 3); }   /* nudo del bambú */
+        x += w;
+      }
+      return c;
+    }
+    var bambooTex = new THREE.CanvasTexture(drawBamboo());
+    bambooTex.encoding = THREE.sRGBEncoding; bambooTex.wrapS = bambooTex.wrapT = THREE.RepeatWrapping;
+    bambooTex.repeat.set(1 / 60, 1 / 60); bambooTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    var bambooMat = new THREE.MeshStandardMaterial({ map: bambooTex, roughness: 0.55, metalness: 0 });
+    var footGeo = new THREE.CylinderGeometry(5, 5, B.feet, 20); footGeo.translate(0, B.feet / 2, 0);
+    var footMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.9 });
+    var bambooCard = { y: B.feet + B.H - B.prof * Math.cos(B.lean), z: B.prof * Math.sin(B.lean) };
+    var standMat = new THREE.MeshStandardMaterial({ color: 0x1d1f23, roughness: 0.62, metalness: 0.02 });
+
+    /* Grabado en la cara de atrás del respaldo (canvas 1080x300) */
+    function drawLabel() {
+      var c = document.createElement("canvas"); c.width = 1080; c.height = 300;
+      var g = c.getContext("2d"), rgb = parseInt(standOf().color.slice(1), 16);
+      var light = (0.299 * (rgb >> 16 & 255) + 0.587 * (rgb >> 8 & 255) + 0.114 * (rgb & 255)) > 150;
+      var name = state.name.trim() || (state.img ? "" : "Tu local"), size = 150, x = 540, tw = 0;
+      if (name) {
+        do { g.font = "800 " + size + 'px "Bricolage Grotesque", Arial, sans-serif'; size -= 2; }
+        while (g.measureText(name).width > (state.img ? 720 : 980) && size > 18);
+        tw = g.measureText(name).width;
+      }
+      if (state.img) {
+        var k = Math.min(260 / state.img.width, 230 / state.img.height), w = state.img.width * k, h = state.img.height * k;
+        var gapL = name ? 36 : 0, lx = 540 - (w + gapL + tw) / 2;
+        g.drawImage(state.img, lx, 150 - h / 2, w, h);
+        x = lx + w + gapL + tw / 2;
+      }
+      if (name) {
+        g.fillStyle = state.stand === "bambu" ? "rgba(74,40,16,.85)" : light ? "rgba(20,22,26,.8)" : "rgba(255,255,255,.85)";
+        g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(name, x, 158);
+      }
+      return c;
+    }
+    var labelTex = new THREE.CanvasTexture(drawLabel());
+    labelTex.encoding = THREE.sRGBEncoding; labelTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    var labelMat = new THREE.MeshStandardMaterial({ map: labelTex, transparent: true, roughness: 0.7, depthWrite: false });
+    var labelGeo = new THREE.PlaneGeometry(56, 56 * 300 / 1080);
+    var labelRot = new THREE.Matrix4().makeBasis(
+      new THREE.Vector3(-1, 0, 0), new THREE.Vector3(0, Math.cos(LEAN), -Math.sin(LEAN)), new THREE.Vector3(0, -Math.sin(LEAN), -Math.cos(LEAN)));
+    function makeLabel() {
+      var l = new THREE.Mesh(labelGeo, labelMat);
+      if (state.stand === "bambu") { l.position.set(0, B.feet + (B.H - B.chb) / 2, B.ye - B.D - 0.06); l.rotation.y = Math.PI; }
+      else { l.position.set(0, 75.3, -20.1); l.setRotationFromMatrix(labelRot); }
+      return l;
+    }
+    if (document.fonts && document.fonts.load) {
+      document.fonts.load('800 80px "Bricolage Grotesque"').then(function () { labelTex.image = drawLabel(); labelTex.needsUpdate = true; }).catch(function () {});
+    }
+
+    var group = new THREE.Group(); scene.add(group);
+    var target = new THREE.Vector3(0, 50, 0), radius = 300, fitRadius = 300, yawTarget = null;
+    var yaw = -0.45, pitch = 0.2, touched = false, t0 = performance.now();
+    /* Entrada de cámara con GSAP: arranca lejos y de arriba, y se acerca girando la primera vez que el visor
+       entra en pantalla. Son desvíos que se suman a la cámara, así no pelean con el arrastre del usuario. */
+    var cam = { k: 1, p: 0, y: 0 }, introDone = REDUCE || !HAS_GSAP;
+    if (!introDone) cam = { k: 1.9, p: 0.5, y: -1.2 };
+
+    function build(refit) {
+      while (group.children.length) group.remove(group.children[0]);
+      var n = count(), aspect = stage.clientWidth / stage.clientHeight;
+      var kinds = [];
+      for (var a = 0; a < state.q.negra; a++) kinds.push("negra");
+      for (var b = 0; b < state.q.blanca; b++) kinds.push("blanca");
+      if (!kinds.length) kinds = ["negra"];
+      kinds = kinds.slice(0, MAX_SHOWN);
+      var shown = kinds.length, maxCols = aspect < 1.25 ? 3 : 6;
+      var nRows = Math.ceil(shown / maxCols), rows = [], left = shown;
+      for (var r0 = 0; r0 < nRows; r0++) { var cnt = Math.ceil(left / (nRows - r0)); rows.push(cnt); left -= cnt; }
+      var bam = state.stand === "bambu";
+      if (!bam) standMat.color.set(standOf().color).convertSRGBToLinear();
+      if (state.logo) { labelTex.image = drawLabel(); labelTex.needsUpdate = true; }
+      var pitchX = bam ? 86 : 72, pitchZ = bam ? 92 : 78, idx = 0, spanX = 0;
+      rows.forEach(function (cntRow, r) {
+        for (var c = 0; c < cntRow; c++, idx++) {
+          var unit = new THREE.Group(), card = makeCard(kinds[idx]);
+          var st = new THREE.Mesh(bam ? bambooGeo : standGeo, bam ? bambooMat : standMat); st.castShadow = true; st.receiveShadow = true; unit.add(st);
+          if (bam) [[-28, 1], [28, 1], [-28, -1], [28, -1]].forEach(function (f) {
+            var ft = new THREE.Mesh(footGeo, footMat); ft.position.set(f[0], 0, f[1] > 0 ? B.ye - 8 : B.ye - B.D + 8); unit.add(ft);
+          });
+          if (state.logo) unit.add(makeLabel());
+          if (bam) { card.position.set(0, bambooCard.y, bambooCard.z); card.rotation.x = -B.lean; }
+          else { card.position.set(0, 24.22, 0.67); card.rotation.x = -LEAN; }
+          unit.add(card);
+          var x = (c - (cntRow - 1) / 2) * pitchX;
+          unit.position.set(x, 0, (r - (nRows - 1) / 2) * pitchZ);
+          spanX = Math.max(spanX, Math.abs(x) + (bam ? 40 : 34));
+          group.add(unit);
+        }
+      });
+      var vf = camera.fov * Math.PI / 180 / 2, hf = Math.atan(Math.tan(vf) * aspect);
+      var depth = (nRows - 1) * pitchZ / 2 + (bam ? 46 : 36);
+      var rad = Math.sqrt(spanX * spanX + depth * depth);
+      fitRadius = Math.max((62 + (nRows - 1) * 24) / Math.sin(vf), rad / Math.sin(hf)) * 1.08;
+      if (refit !== false) radius = fitRadius;
+    }
+
+    /* Solo se reconstruye si el visor cambió de tamaño de verdad (en el celular, la barra del navegador
+       que aparece y desaparece al scrollear no cambia el tamaño del visor) */
+    var lastW = 0, lastH = 0, resizeRaf = 0;
+    function resize() {
+      var w = stage.clientWidth, h = stage.clientHeight;
+      if (!w || !h || (w === lastW && h === lastH)) return;
+      lastW = w; lastH = h;
+      renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+      build(true);
+    }
+    function queueResize() { cancelAnimationFrame(resizeRaf); resizeRaf = requestAnimationFrame(resize); }
+    var reduce = REDUCE;
+    var visible = true;
+    function frame(now) {
+      requestAnimationFrame(frame);
+      if (!visible) return;
+      if (yawTarget !== null) { yaw += (yawTarget - yaw) * 0.1; if (Math.abs(yawTarget - yaw) < 0.002) yawTarget = null; }
+      var y = yaw + cam.y + ((touched || reduce) ? 0 : Math.sin((now - t0) / 2600) * 0.5 + 0.45);
+      var r = radius * cam.k, p = Math.max(-0.05, Math.min(1.2, pitch + cam.p));
+      camera.position.set(target.x + r * Math.sin(y) * Math.cos(p), target.y + r * Math.sin(p), target.z + r * Math.cos(y) * Math.cos(p));
+      camera.lookAt(target);
+      scene.fog.near = r * 1.25; scene.fog.far = r * 3.4;
+      renderer.render(scene, camera);
+    }
+    if ("IntersectionObserver" in window) new IntersectionObserver(function (e) { visible = e[0].isIntersecting; }).observe(stage);
+
+    viewer.intro = function () {
+      if (introDone) return; introDone = true;
+      gsap.to(cam, { k: 1, p: 0, y: 0, duration: 2.2, ease: "power3.inOut" });
+    };
+    if (!introDone) {
+      if ("IntersectionObserver" in window) {
+        var introIO = new IntersectionObserver(function (e) {
+          if (e[0].intersectionRatio >= 0.45) { introIO.disconnect(); viewer.intro(); }
+        }, { threshold: [0, 0.45] });
+        introIO.observe(stage);
+      } else viewer.intro();
+    }
+
+    var drag = null;
+    function settle() { if (!touched) { if (!reduce) yaw += Math.sin((performance.now() - t0) / 2600) * 0.5 + 0.45; touched = true; } }
+    viewer.look = function (back) { settle(); yawTarget = back ? Math.PI + 0.45 : 0.25; if (reduce) { yaw = yawTarget; yawTarget = null; } };
+    stage.addEventListener("pointerdown", function (e) {
+      yawTarget = null;
+      if (!touched) { yaw += Math.sin((performance.now() - t0) / 2600) * 0.5 + 0.45; touched = true; }
+      drag = { x: e.clientX, y: e.clientY, touch: e.pointerType === "touch" };
+      try { stage.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+    stage.addEventListener("pointermove", function (e) {
+      if (!drag) return;
+      yaw -= (e.clientX - drag.x) * 0.008;
+      if (!drag.touch) pitch = Math.max(-0.05, Math.min(1.1, pitch + (e.clientY - drag.y) * 0.006));
+      drag.x = e.clientX; drag.y = e.clientY;
+    });
+    ["pointerup", "pointercancel"].forEach(function (ev) { stage.addEventListener(ev, function () { drag = null; }); });
+    stage.tabIndex = 0;
+    stage.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft") { yaw -= 0.15; touched = true; e.preventDefault(); }
+      if (e.key === "ArrowRight") { yaw += 0.15; touched = true; e.preventDefault(); }
+    });
+
+    if ("ResizeObserver" in window) new ResizeObserver(queueResize).observe(stage);
+    else window.addEventListener("resize", queueResize);
+    viewer.rebuild = function (refit) { build(refit); };
+    resize(); requestAnimationFrame(frame);
+  }
+
+  refreshUI();
+
+  /* Three.js (600 KB) y el modelo del soporte se bajan recién cuando el visor está por aparecer */
+  function loadScript(src) {
+    return new Promise(function (ok, fail) {
+      var s = document.createElement("script"); s.src = src;
+      s.onload = ok; s.onerror = function () { fail(new Error(src)); };
+      document.head.appendChild(s);
+    });
+  }
+  var viewerStarted = false;
+  function startViewer() {
+    if (viewerStarted) return; viewerStarted = true;
+    (window.THREE ? Promise.resolve() : loadScript("three.min.js"))
+      .then(function () { return window.SOPORTE_STL ? null : loadScript("soporte.js"); })
+      .then(function () { initViewer(); $("#stage-loading").hidden = true; })
+      .catch(function () { $("#stage-loading").hidden = true; $("#stage-hint").hidden = true; $("#fallback").hidden = false; });
+  }
+  if ("IntersectionObserver" in window) {
+    var lazyIO = new IntersectionObserver(function (e) {
+      if (e[0].isIntersecting) { lazyIO.disconnect(); startViewer(); }
+    }, { rootMargin: "900px 0px" });
+    lazyIO.observe(stage);
+  } else startViewer();
+
+  /* ---------------- Animaciones con scroll (GSAP + ScrollTrigger) ----------------
+     Todo arranca de un estado visible: si GSAP no carga, la página se ve igual, solo que quieta. */
+  (function () {
+    if (!HAS_GSAP || !window.ScrollTrigger) return;
+    gsap.registerPlugin(ScrollTrigger);
+    var mm = gsap.matchMedia();
+
+    mm.add("(prefers-reduced-motion: no-preference)", function () {
+      /* Entrada del hero al cargar */
+      gsap.from(".hero-copy > *", { y: 22, autoAlpha: 0, duration: 0.7, ease: "power3.out", stagger: 0.07, clearProps: "transform,opacity,visibility" });
+      gsap.from("#demo", { y: 30, scale: 0.97, duration: 0.9, ease: "power3.out", delay: 0.1, clearProps: "transform" });
+
+      /* Pasos: suben en cascada y el número hace "pop" */
+      gsap.fromTo(".steps li", { y: 34, "--pop": 0.4 }, { y: 0, "--pop": 1, duration: 0.8, ease: "back.out(1.6)", stagger: 0.14,
+        scrollTrigger: { trigger: ".steps", start: "top 85%", once: true } });
+
+      /* Beneficios: la raya de arriba se dibuja de izquierda a derecha */
+      gsap.fromTo(".benefits > div", { "--rule": "0%" }, { "--rule": "100%", duration: 0.9, ease: "power2.inOut", stagger: 0.12,
+        scrollTrigger: { trigger: ".benefits", start: "top 85%", once: true } });
+
+      /* Preguntas: entran en cascada suave */
+      gsap.from(".faq details", { y: 18, duration: 0.6, ease: "power2.out", stagger: 0.05,
+        scrollTrigger: { trigger: ".faq", start: "top 88%", once: true } });
+
+      /* Visor: el bloque sube un poco al entrar */
+      gsap.from("#visor", { y: 40, duration: 0.9, ease: "power3.out",
+        scrollTrigger: { trigger: "#visor", start: "top 90%", once: true } });
+    });
+
+    /* Galería en escritorio: parallax de las fotos dentro de su marco, atado al scroll */
+    mm.add("(prefers-reduced-motion: no-preference) and (min-width: 700px)", function () {
+      gsap.utils.toArray("#gal figure").forEach(function (fig, i) {
+        var img = fig.querySelector("img");
+        gsap.fromTo(img, { yPercent: -7, scale: 1.16 }, { yPercent: 7, scale: 1.16, ease: "none",
+          scrollTrigger: { trigger: fig, start: "top bottom", end: "bottom top", scrub: 0.6 + i * 0.25 } });
+      });
+    });
+
+    /* Las fuentes y las fotos cambian alturas: recalcular los puntos de disparo cuando terminan de cargar */
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { ScrollTrigger.refresh(); });
+    window.addEventListener("load", function () { ScrollTrigger.refresh(); });
+  })();
+})();
+</script>
+
+
+</body>
+</html>
