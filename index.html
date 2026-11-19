@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Web de placas NFC</title>
+<!-- v3: soporte de bambú + grabado láser animado -->
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#11151c">
 <meta property="og:type" content="website">
@@ -406,6 +407,7 @@ footer { padding-block: 28px 96px; color: var(--muted); font-size: 0.85rem; bord
             <label class="btn btn-ghost btn-sm" for="in-logo" id="logo-btn">Subir logo</label>
             <input id="in-logo" type="file" accept="image/*" hidden>
             <button type="button" class="btn btn-ghost btn-sm" id="logo-del" hidden>Quitar</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="logo-replay">↻ Ver cómo se graba</button>
           </div>
           <p class="hint">Va grabado en la parte de atrás del soporte, y el visor gira para mostrártelo. La imagen no se sube a ningún lado: después nos la mandás por WhatsApp.</p>
         </div>
@@ -595,7 +597,7 @@ var PRECIO_BAMBU = 0;
     /* Sin tarjetas, el botón de pedir deja de ser un link (así tampoco se activa con el teclado) */
     if (n === 0) $("#buy-btn").removeAttribute("href");
   }
-  function set(key, val) { state[key] = val; refreshUI(); viewer.rebuild(false); if (key === "logo") viewer.look(val); }
+  function set(key, val) { state[key] = val; refreshUI(); viewer.rebuild(false); if (key === "logo") { viewer.look(val); if (val) viewer.burn(true); } }
 
   /* Galería: cambia entre las fotos con tarjeta negra y blanca */
   $("#seg-gal").addEventListener("click", function (e) {
@@ -622,10 +624,12 @@ var PRECIO_BAMBU = 0;
     });
   });
   $("#seg-logo").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) set("logo", b.dataset.l === "1"); });
-  var nameTimer;
+  var nameTimer, burnTimer;
   $("#in-name").addEventListener("input", function (e) {
-    state.name = e.target.value; refreshUI();
+    state.name = e.target.value; refreshUI(); viewer.cancelBurn();
     clearTimeout(nameTimer); nameTimer = setTimeout(function () { viewer.rebuild(false); }, 120);
+    /* cuando dejás de escribir, el láser graba el nombre */
+    clearTimeout(burnTimer); burnTimer = setTimeout(function () { viewer.burn(); }, 900);
   });
   $("#in-name").addEventListener("keydown", function (e) { if (e.key === "Enter") e.target.blur(); });
   $("#in-logo").addEventListener("change", function (e) {
@@ -639,7 +643,7 @@ var PRECIO_BAMBU = 0;
         c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
         c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
         var small = new Image();
-        small.onload = function () { set("img", small); };
+        small.onload = function () { set("img", small); viewer.burn(); };
         small.src = c.toDataURL("image/png");
       };
       img.src = r.result;
@@ -647,6 +651,7 @@ var PRECIO_BAMBU = 0;
     r.readAsDataURL(f); e.target.value = "";
   });
   $("#logo-del").addEventListener("click", function () { set("img", null); });
+  $("#logo-replay").addEventListener("click", function () { viewer.burn(); });
 
   /* ---------------- Dibujo de la tarjeta (se usa en el visor y en la animación) ---------------- */
     var G_PATHS = [
@@ -717,7 +722,7 @@ var PRECIO_BAMBU = 0;
   })();
 
   /* ---------------- Visor 3D (Three.js). Unidades en milímetros. ---------------- */
-  var viewer = { rebuild: function () {}, look: function () {}, intro: function () {} };
+  var viewer = { rebuild: function () {}, look: function () {}, intro: function () {}, burn: function () {}, cancelBurn: function () {} };
   var stage = $("#stage");
 
   function initViewer() {
@@ -889,10 +894,86 @@ var PRECIO_BAMBU = 0;
       var l = new THREE.Mesh(labelGeo, labelMat);
       if (state.stand === "bambu") { l.position.set(0, B.feet + (B.H - B.chb) / 2, B.ye - B.D - 0.06); l.rotation.y = Math.PI; }
       else { l.position.set(0, 75.3, -20.1); l.setRotationFromMatrix(labelRot); }
+      burnLabel = l;
       return l;
     }
     if (document.fonts && document.fonts.load) {
-      document.fonts.load('800 80px "Bricolage Grotesque"').then(function () { labelTex.image = drawLabel(); labelTex.needsUpdate = true; }).catch(function () {});
+      document.fonts.load('800 80px "Bricolage Grotesque"').then(function () { if (!anim) { labelTex.image = drawLabel(); labelTex.needsUpdate = true; } }).catch(function () {});
+    }
+
+    /* ---- Animación de grabado láser: una sola pieza se separa del resto y el láser quema el texto de izquierda a derecha ---- */
+    var PULL = 56, anim = null, sep = 0, chosenUnit = null, chosenBaseZ = 0, burnLabel = null, baseCanvas = null;
+    var burnCanvas = document.createElement("canvas"); burnCanvas.width = 1080; burnCanvas.height = 300;
+    var glowCanvas = document.createElement("canvas"); glowCanvas.width = 1080; glowCanvas.height = 300;
+    var clamp01 = function (v) { return Math.max(0, Math.min(1, v)); };
+    var easeIO = function (v) { return v * v * (3 - 2 * v); };
+    function dotTexture() {
+      var c = document.createElement("canvas"); c.width = c.height = 64; var g = c.getContext("2d");
+      var gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+      gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(0.25, "rgba(255,200,110,.9)"); gr.addColorStop(1, "rgba(255,90,20,0)");
+      g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c);
+    }
+    var dotTex = dotTexture();
+    var laserDot = new THREE.Sprite(new THREE.SpriteMaterial({ map: dotTex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false }));
+    laserDot.scale.set(9, 9, 1); laserDot.visible = false; scene.add(laserDot);
+    var laserLight = new THREE.PointLight(0xff7a2a, 0, 110); scene.add(laserLight);
+    var NS = 70, sparkPos = new Float32Array(NS * 3), sparkVel = new Float32Array(NS * 3), sparkLife = new Float32Array(NS), sparkI = 0;
+    for (var si = 0; si < NS; si++) sparkPos[si * 3 + 1] = -999;
+    var sparkGeo = new THREE.BufferGeometry(); sparkGeo.setAttribute("position", new THREE.BufferAttribute(sparkPos, 3));
+    var sparks = new THREE.Points(sparkGeo, new THREE.PointsMaterial({ map: dotTex, size: 3.2, color: 0xffa040, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false }));
+    sparks.frustumCulled = false; scene.add(sparks);
+    var lastNow = 0, tmpV = new THREE.Vector3();
+
+    function applySep() { if (chosenUnit) chosenUnit.position.z = chosenBaseZ - PULL * sep; }
+    function finishBurn() {
+      anim = null; laserDot.visible = false; laserLight.intensity = 0;
+      labelMat.emissiveMap = null; labelMat.emissive.setRGB(0, 0, 0); labelMat.needsUpdate = true;
+      if (state.logo) { labelTex.image = drawLabel(); labelTex.needsUpdate = true; }
+    }
+    function drawBurn(p, now) {
+      var W = 1080, H = 300, edge = p * W, g = burnCanvas.getContext("2d"), t = glowCanvas.getContext("2d");
+      g.clearRect(0, 0, W, H);
+      g.save(); g.beginPath(); g.rect(0, 0, edge, H); g.clip(); g.drawImage(baseCanvas, 0, 0); g.restore();
+      /* lo recién quemado brilla al rojo vivo y se va apagando hasta el color de la madera grabada */
+      var w = 300; t.clearRect(0, 0, W, H); t.globalCompositeOperation = "source-over";
+      t.save(); t.beginPath(); t.rect(Math.max(0, edge - w), 0, Math.min(w, edge), H); t.clip(); t.drawImage(baseCanvas, 0, 0); t.restore();
+      t.globalCompositeOperation = "source-in";
+      var gr = t.createLinearGradient(edge - w, 0, edge, 0);
+      gr.addColorStop(0, "rgba(255,80,10,0)"); gr.addColorStop(0.55, "rgba(255,110,20,.85)"); gr.addColorStop(1, "rgba(255,235,170,1)");
+      t.fillStyle = gr; t.fillRect(0, 0, W, H);
+      g.drawImage(glowCanvas, 0, 0);
+      labelTex.image = burnCanvas; labelTex.needsUpdate = true;
+      return 150 + Math.sin(now * 0.045) * 52;   /* alto al que el láser zigzaguea sobre las letras */
+    }
+    function stepBurn(now) {
+      var dt = Math.min(0.05, (now - (lastNow || now)) / 1000); lastNow = now;
+      var emitting = false;
+      if (anim && chosenUnit && burnLabel) {
+        var t = now - anim.t0;
+        sep = anim.s0 + (1 - anim.s0) * easeIO(clamp01(t / 650)); applySep();
+        var p = clamp01((t - 700) / 2800);
+        if (t >= 700) {
+          var ly = drawBurn(p, now);
+          labelMat.emissiveMap = labelTex; labelMat.emissive.setRGB(1, 1, 1);
+          burnLabel.updateWorldMatrix(true, false);
+          tmpV.set((p - 0.5) * 56, (0.5 - ly / 300) * (56 * 300 / 1080), 0.6); burnLabel.localToWorld(tmpV);
+          laserDot.position.copy(tmpV); laserDot.visible = p < 1; laserLight.position.copy(tmpV);
+          laserLight.intensity = p < 1 ? 1.6 + Math.random() * 0.8 : 0; emitting = p < 1;
+          if (emitting) for (var k = 0; k < 2; k++) {
+            var i = sparkI++ % NS; sparkPos[i * 3] = tmpV.x; sparkPos[i * 3 + 1] = tmpV.y; sparkPos[i * 3 + 2] = tmpV.z;
+            sparkVel[i * 3] = (Math.random() - 0.5) * 50; sparkVel[i * 3 + 1] = 25 + Math.random() * 55; sparkVel[i * 3 + 2] = -10 - Math.random() * 40; sparkLife[i] = 0.5 + Math.random() * 0.5;
+          }
+        }
+        if (t > 700 + 2800 + 400) finishBurn();
+      }
+      for (var j = 0; j < NS; j++) {
+        if (sparkLife[j] > 0) {
+          sparkLife[j] -= dt; sparkVel[j * 3 + 1] -= 220 * dt;
+          sparkPos[j * 3] += sparkVel[j * 3] * dt; sparkPos[j * 3 + 1] += sparkVel[j * 3 + 1] * dt; sparkPos[j * 3 + 2] += sparkVel[j * 3 + 2] * dt;
+          if (sparkLife[j] <= 0) sparkPos[j * 3 + 1] = -999;
+        }
+      }
+      sparkGeo.attributes.position.needsUpdate = true;
     }
 
     var group = new THREE.Group(); scene.add(group);
@@ -916,7 +997,9 @@ var PRECIO_BAMBU = 0;
       for (var r0 = 0; r0 < nRows; r0++) { var cnt = Math.ceil(left / (nRows - r0)); rows.push(cnt); left -= cnt; }
       var bam = state.stand === "bambu";
       if (!bam) standMat.color.set(standOf().color).convertSRGBToLinear();
-      if (state.logo) { labelTex.image = drawLabel(); labelTex.needsUpdate = true; }
+      if (state.logo && !anim) { labelTex.image = drawLabel(); labelTex.needsUpdate = true; }
+      chosenUnit = null; burnLabel = null; if (!state.logo) sep = 0;
+      var chosenIdx = Math.floor(rows[0] / 2);
       var pitchX = bam ? 86 : 72, pitchZ = bam ? 92 : 78, idx = 0, spanX = 0;
       rows.forEach(function (cntRow, r) {
         for (var c = 0; c < cntRow; c++, idx++) {
@@ -925,7 +1008,7 @@ var PRECIO_BAMBU = 0;
           if (bam) [[-28, 1], [28, 1], [-28, -1], [28, -1]].forEach(function (f) {
             var ft = new THREE.Mesh(footGeo, footMat); ft.position.set(f[0], 0, f[1] > 0 ? B.ye - 8 : B.ye - B.D + 8); unit.add(ft);
           });
-          if (state.logo) unit.add(makeLabel());
+          if (state.logo && idx === chosenIdx) unit.add(makeLabel());
           if (bam) { card.position.set(0, bambooCard.y, bambooCard.z); card.rotation.x = -B.lean; }
           else { card.position.set(0, 24.22, 0.67); card.rotation.x = -LEAN; }
           unit.add(card);
@@ -933,10 +1016,11 @@ var PRECIO_BAMBU = 0;
           unit.position.set(x, 0, (r - (nRows - 1) / 2) * pitchZ);
           spanX = Math.max(spanX, Math.abs(x) + (bam ? 40 : 34));
           group.add(unit);
+          if (state.logo && idx === chosenIdx) { chosenUnit = unit; chosenBaseZ = unit.position.z; applySep(); }
         }
       });
       var vf = camera.fov * Math.PI / 180 / 2, hf = Math.atan(Math.tan(vf) * aspect);
-      var depth = (nRows - 1) * pitchZ / 2 + (bam ? 46 : 36);
+      var depth = (nRows - 1) * pitchZ / 2 + (bam ? 46 : 36) + (state.logo ? PULL : 0);
       var rad = Math.sqrt(spanX * spanX + depth * depth);
       fitRadius = Math.max((62 + (nRows - 1) * 24) / Math.sin(vf), rad / Math.sin(hf)) * 1.08;
       if (refit !== false) radius = fitRadius;
@@ -964,6 +1048,7 @@ var PRECIO_BAMBU = 0;
       camera.position.set(target.x + r * Math.sin(y) * Math.cos(p), target.y + r * Math.sin(p), target.z + r * Math.cos(y) * Math.cos(p));
       camera.lookAt(target);
       scene.fog.near = r * 1.25; scene.fog.far = r * 3.4;
+      stepBurn(now);
       renderer.render(scene, camera);
     }
     if ("IntersectionObserver" in window) new IntersectionObserver(function (e) { visible = e[0].isIntersecting; }).observe(stage);
@@ -1006,6 +1091,15 @@ var PRECIO_BAMBU = 0;
     if ("ResizeObserver" in window) new ResizeObserver(queueResize).observe(stage);
     else window.addEventListener("resize", queueResize);
     viewer.rebuild = function (refit) { build(refit); };
+    /* Arranca la animación de grabado (fromZero: la pieza sale desde la fila). Sin animaciones: queda grabado de una. */
+    viewer.burn = function (fromZero) {
+      if (!state.logo || !chosenUnit) return;
+      if (fromZero) sep = 0;
+      if (REDUCE) { sep = 1; applySep(); return; }
+      baseCanvas = drawLabel(); anim = { t0: performance.now(), s0: sep };
+      labelTex.image = burnCanvas; burnCanvas.getContext("2d").clearRect(0, 0, 1080, 300); labelTex.needsUpdate = true;
+    };
+    viewer.cancelBurn = function () { if (anim) { sep = 1; applySep(); finishBurn(); } };
     resize(); requestAnimationFrame(frame);
   }
 
