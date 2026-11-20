@@ -895,7 +895,7 @@ html { scrollbar-width: none; } html::-webkit-scrollbar { display: none; }
             </div>
           </div>
         </div>
-        <p class="hint" id="tiers">1 con soporte $650 · 2 por $1.200 · 3 por $1.700 · 4 por $2.150 · <b class="best">5 por $2.500 ★ Más elegido</b> · de la 6 a la 10, +$450 c/u · desde la 11, +$400 c/u.</p>
+        <p class="hint" id="tiers">Con soporte de bambú: 1 $650 · 2 por $1.200 · 3 por $1.700 · 4 por $2.150 · <b class="best">5 por $2.500 ★ Más elegido</b> · de la 6 a la 10, +$450 c/u · desde la 11, +$400 c/u.</p>
       </div>
       <div class="opt" id="opt-stand">
         <span class="opt-label" id="l-stand">Soporte <b id="stand-name"></b></span>
@@ -967,7 +967,7 @@ html { scrollbar-width: none; } html::-webkit-scrollbar { display: none; }
         <details open><summary>¿El cliente tiene que bajar una app?</summary><p>No. Acerca el celular a la tarjeta y le aparece un aviso que abre directo la página de reseñas de tu local.</p></details>
         <details><summary>¿Funciona con cualquier celular?</summary><p>Con los iPhone desde el XS en adelante y con casi todos los Android que tienen NFC, que es lo mismo que se usa para pagar con el celular.</p></details>
         <details><summary>¿Vienen listas para usar?</summary><p>Sí. Nos pasás tu negocio en Google Maps y te las entregamos programadas. Las sacás de la bolsa y las ponés en el mostrador.</p></details>
-        <details><summary>¿Cuánto salen?</summary><p id="faq-precios">Todas vienen con su soporte. Una tarjeta con soporte sale $650, dos $1.200, tres $1.700, cuatro $2.150 y cinco $2.500 (el pack más elegido). De la sexta a la décima, cada una suma $450, y desde la undécima, $400. Es un pago único.</p></details>
+        <details><summary>¿Cuánto salen?</summary><p id="faq-precios">Todas vienen con su soporte y el precio depende de la madera. Pino: 1 $550, 5 $2.100. Bambú o madera quemada: 1 $650, 5 $2.500. Cuantas más llevás, menos sale cada una. Es un pago único.</p></details>
         <details><summary>¿Pueden llevar el logo de mi local?</summary><p>Sí. Por <span data-extra>$100</span> más por soporte grabamos al frente el nombre o el logo de tu local. En <a href="#pedido">Armá tu pedido</a> podés probar cómo queda antes de pedir.</p></details>
         <details><summary>¿Qué soporte elijo?</summary><p>Los tres son de madera maciza y sin metal, así que no interfieren con el NFC. Bambú: laminado, de veta fina y tono cálido. Pino: más claro y liviano. Madera quemada: negra como el carbón, con la veta marcada (la técnica japonesa shou sugi ban), con un look moderno y pensado para combinar con la tarjeta negra. Los tres miden 72 × 72 × 24 mm y llevan una ranura fina inclinada 10° hacia atrás: la tarjeta queda parada y se ve el 93%. Con la tarjeta puesta miden unos 10 cm de alto y llevan patitas de goma abajo. Lo elegís en <a href="#pedido">Armá tu pedido</a>.</p></details>
         <details><summary>¿Hay que pagar algo por mes?</summary><p>No. Es un pago único. La tarjeta no lleva batería ni necesita mantenimiento.</p></details>
@@ -1020,7 +1020,13 @@ var CONFIG = {
   facebook: "",                     // Página de Facebook: usuario o link completo (vacío = lleva a facebook.com). TODO: completar
   instagram: "",                    // Usuario de Instagram sin @ (vacío = lleva a instagram.com). TODO: completar
   tiktok: "",                       // Usuario de TikTok sin @ (vacío = lleva a tiktok.com). TODO: completar
-  precios: { 1: 650, 2: 1200, 3: 1700, 4: 2150, 5: 2500 },   // Precio total según cantidad (siempre con soportes)
+  /* Precio total según cantidad y madera (siempre con soportes). "extra" = cada una de la 6 a la 10; "extra10" = desde la 11. */
+  preciosMadera: {
+    pino:    { 1: 550, 2: 1000, 3: 1450, 4: 1800, 5: 2100, extra: 400, extra10: 350 },
+    bambu:   { 1: 650, 2: 1200, 3: 1700, 4: 2150, 5: 2500, extra: 450, extra10: 400 },
+    quemado: { 1: 650, 2: 1200, 3: 1700, 4: 2150, 5: 2500, extra: 450, extra10: 400 }
+  },
+  precios: { 1: 650, 2: 1200, 3: 1700, 4: 2150, 5: 2500 },   // (referencia: bambú y quemada)   // Precio total según cantidad (siempre con soportes)
   precioExtra: 450,                 // Cada tarjeta con soporte de la 6 a la 10
   precioExtra10: 400,               // Cada tarjeta con soporte desde la 11 en adelante
   extraLogo: 100,                   // Recargo por soporte con el logo o nombre del local
@@ -1053,15 +1059,20 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
   $$("[data-red]").forEach(function (a) { var u = (CONFIG[a.dataset.red] || "").replace(/^@/, ""); if (u) a.href = /^https?:/.test(u) ? u : a.dataset.red === "instagram" ? "https://www.instagram.com/" + u + "/" : a.dataset.red === "facebook" ? "https://www.facebook.com/" + u : "https://www.tiktok.com/@" + u; });
   $$("[data-wa-num]").forEach(function (e) { e.textContent = CONFIG.whatsappVisible; });
   $$("[data-extra]").forEach(function (e) { e.textContent = pesos(CONFIG.extraLogo); });
-  $("#faq-precios").textContent = "Todas vienen con su soporte. Una tarjeta con soporte sale " + pesos(CONFIG.precios[1]) + ", dos " + pesos(CONFIG.precios[2]) + ", tres " + pesos(CONFIG.precios[3])
-    + ", cuatro " + pesos(CONFIG.precios[4]) + " y cinco " + pesos(CONFIG.precios[5]) + " (el pack más elegido). De la sexta a la décima, cada una suma " + pesos(CONFIG.precioExtra)
-    + ", y desde la undécima, " + pesos(CONFIG.precioExtra10) + ". Es un pago único.";
-  $("#tiers").innerHTML = "1 con soporte " + pesos(CONFIG.precios[1]) + " · 2 por " + pesos(CONFIG.precios[2]) + " · 3 por " + pesos(CONFIG.precios[3])
-    + " · 4 por " + pesos(CONFIG.precios[4]) + " · <b class=\"best\">5 por " + pesos(CONFIG.precios[5]) + " ★ Más elegido</b> · de la 6 a la 10, +" + pesos(CONFIG.precioExtra)
-    + " c/u · desde la 11, +" + pesos(CONFIG.precioExtra10) + " c/u.";
+  (function () {
+    var M = CONFIG.preciosMadera, f = function (k, nom) { return nom + ": 1 " + pesos(M[k][1]) + ", 5 " + pesos(M[k][5]); };
+    $("#faq-precios").textContent = "Todas vienen con su soporte y el precio depende de la madera. " + f("pino", "Pino") + ". " + f("bambu", "Bambú o madera quemada") + ". Cuantas más llevás, menos sale cada una. Es un pago único.";
+  })();
 
   function withLogo() { return state.logo && count() >= 1; }
-  function base(n) { return n === 0 ? 0 : n <= 5 ? CONFIG.precios[n] : n <= 10 ? CONFIG.precios[5] + (n - 5) * CONFIG.precioExtra : CONFIG.precios[5] + 5 * CONFIG.precioExtra + (n - 10) * CONFIG.precioExtra10; }
+  function scaleOf(st) { return CONFIG.preciosMadera[st] || CONFIG.preciosMadera.bambu; }
+  function base(n, st) { var P = scaleOf(st || state.stand); return n === 0 ? 0 : n <= 5 ? P[n] : n <= 10 ? P[5] + (n - 5) * P.extra : P[5] + 5 * P.extra + (n - 10) * P.extra10; }
+  function renderTiers() {
+    var P = scaleOf(state.stand);
+    $("#tiers").innerHTML = "Con soporte de " + standOf().nombre.toLowerCase() + ": 1 " + pesos(P[1]) + " · 2 por " + pesos(P[2]) + " · 3 por " + pesos(P[3])
+      + " · 4 por " + pesos(P[4]) + " · <b class=\"best\">5 por " + pesos(P[5]) + " ★ Más elegido</b> · de la 6 a la 10, +" + pesos(P.extra)
+      + " c/u · desde la 11, +" + pesos(P.extra10) + " c/u.";
+  }
   function extraStand(n) { return ({ bambu: PRECIO_BAMBU, pino: PRECIO_PINO, quemado: PRECIO_QUEMADO }[state.stand] || 0) * n; }
   function total() { var n = count(); return base(n) + extraStand(n) + (withLogo() ? CONFIG.extraLogo * n : 0); }
   function cardsText() {
@@ -1096,7 +1107,10 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
   function cartN() { return cart.reduce(function (t, it) { return t + itemN(it); }, 0); }
   function cartTotal() {
     var n = cartN();
-    return base(n) + cart.reduce(function (t, it) { return t + itemN(it) * (standExtra(it.stand) + (it.logo ? CONFIG.extraLogo : 0)); }, 0);
+    if (!n) return 0;
+    var byWood = {}; cart.forEach(function (it) { byWood[it.stand] = (byWood[it.stand] || 0) + itemN(it); });
+    var cards = 0; for (var w in byWood) cards += byWood[w] * base(n, w) / n;
+    return Math.round(cards / 10) * 10 + cart.reduce(function (t, it) { return t + itemN(it) * (standExtra(it.stand) + (it.logo ? CONFIG.extraLogo : 0)); }, 0);
   }
   function cartMsg() {
     var n = cartN(), L = ["Hola! Quiero hacer este pedido:"], local = "", logo = false;
@@ -1146,7 +1160,7 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     var n = count();
     $("#q-negra").textContent = state.q.negra; $("#q-blanca").textContent = state.q.blanca;
     $("#menos-negra").disabled = !state.q.negra; $("#menos-blanca").disabled = !state.q.blanca;
-    showPrice(total());
+    showPrice(total()); renderTiers();
     $("#price-sub").textContent = n === 0 ? "Sumá tarjetas con el + para armar tu pedido"
       : (n === 1 ? "1 tarjeta con su soporte" : n + " tarjetas con sus " + n + " soportes") + " de " + standOf().nombre.toLowerCase() + (n === 5 ? " · Más elegido" : "")
         + (state.logo || extraStand(n) ? " (" + pesos(base(n)) + (extraStand(n) ? " + " + standOf().nombre.toLowerCase() + " " + pesos(extraStand(n)) : "") + (state.logo ? " + logo " + pesos(CONFIG.extraLogo * n) : "") + ")" : "");
