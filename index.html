@@ -680,16 +680,24 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
 @media (min-width: 900px) { .pq-cue { left: max(36px, calc((100vw - 1240px) / 2 + 36px)); transform: none; justify-items: start; } }
 
 
-/* barra de scroll grande al costado (como la del celu pero bien visible) */
-.side-bar { position: fixed; z-index: 60; right: 5px; top: calc(70px + env(safe-area-inset-top, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); width: 7px; border-radius: 99px; background: rgba(255,255,255,.14); pointer-events: none; }
-.side-bar i { position: absolute; left: 0; right: 0; top: 0; height: 16%; border-radius: 99px; background: #fff; box-shadow: 0 0 0 1.5px rgba(0,0,0,.35), 0 0 12px rgba(255,255,255,.75);
-  transform: translateY(calc(var(--prog, 0) * 525%)); }
+/* barra de scroll grande al costado: va justo encima de la del celu (mismo largo y posición), así se ve una sola */
+html { scrollbar-width: none; } html::-webkit-scrollbar { display: none; }
+.side-bar { position: fixed; z-index: 60; right: 1px; top: 3px; bottom: 3px; width: 6px; border-radius: 99px; background: rgba(255,255,255,.12); pointer-events: none; }
+.side-bar i { position: absolute; left: 0; right: 0; top: 0; height: var(--th, 40px); border-radius: 99px; background: #fff; box-shadow: 0 0 0 1.5px rgba(0,0,0,.35), 0 0 12px rgba(255,255,255,.75);
+  transform: translateY(var(--ty, 0px)); }
 .side-bar.hint i { animation: sbHint 1.3s ease-in-out infinite; }
-@keyframes sbHint { 0%, 100% { top: 0; } 50% { top: 5%; } }
-@media (min-width: 900px) { .side-bar { right: 3px; width: 9px; top: 90px; bottom: 24px; } }
+@keyframes sbHint { 0%, 100% { top: 0; } 50% { top: 4%; } }
+@media (min-width: 900px) { .side-bar { right: 3px; width: 9px; top: 6px; bottom: 6px; } }
 /* si no bajó en unos segundos, la escena hace un saltito para mostrar que se mueve */
 .pq-pin.nudge .pq-grid { animation: nudge 1s ease-in-out; }
 @keyframes nudge { 0%, 100% { transform: none; } 35% { transform: translateY(-26px); } 65% { transform: translateY(4px); } }
+/* en el celu: la calle pegada abajo del texto, todo junto y centrado en la pantalla */
+@media (max-width: 899px) {
+  .pq-pin { align-items: center; }
+  .pq-grid { grid-template-rows: auto auto; align-content: center; gap: 14px; padding-top: 0; }
+  .pq-vis { align-self: start; width: min(100%, 54svh); }
+  .pq-step { top: auto; bottom: 0; }
+}
 </style>
 
 </head>
@@ -1708,7 +1716,7 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     function update() {
       ticking = false;
       var vh = window.innerHeight, max = root.scrollHeight - vh, y = window.pageYOffset;
-      prog.style.setProperty("--prog", max > 0 ? (y / max).toFixed(4) : 0); var sbx = document.querySelector(".side-bar"); if (sbx) sbx.style.setProperty("--prog", max > 0 ? (y / max).toFixed(4) : 0);
+      prog.style.setProperty("--prog", max > 0 ? (y / max).toFixed(4) : 0); var sbx = document.querySelector(".side-bar"); if (sbx) { var H = sbx.clientHeight, th = Math.max(36, Math.round(H * vh / root.scrollHeight)); sbx.style.setProperty("--th", th + "px"); sbx.style.setProperty("--ty", (max > 0 ? Math.round((H - th) * y / max) : 0) + "px"); }
       var act = 0;
       secs.forEach(function (sc, i) { if (sc.getBoundingClientRect().top <= vh * 0.5) act = i; });
       if (act !== cur) { cur = act; links.forEach(function (a, i) { a.setAttribute("aria-current", String(i === act)); }); }
