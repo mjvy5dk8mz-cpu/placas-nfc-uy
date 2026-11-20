@@ -464,6 +464,103 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
 }
 .lead, .sec-head p, .steps p, .benefits p { text-wrap: pretty; }
 @media (max-width: 899px) { .sec.portada { padding-top: calc(58px + env(safe-area-inset-top, 0px)); } }
+
+/* ---------- Entrada: por qué Google muestra a uno primero ---------- */
+.sec.porque { height: 520vh; padding: 0; border-top: 0; }
+.pq-pin { position: sticky; top: 0; height: 100vh; height: 100svh; display: flex; align-items: center; overflow: hidden; padding-top: calc(58px + env(safe-area-inset-top, 0px)); }
+.pq-grid { display: grid; gap: 22px; width: 100%; align-items: center; }
+.pq-copy { position: relative; min-height: 12.5em; }
+.pq-step { position: absolute; left: 0; right: 0; top: 50%; opacity: 0; transform: translateY(calc(-50% + 34px)); transition: opacity .45s ease, transform .6s cubic-bezier(.2, 1.15, .35, 1); pointer-events: none; display: grid; gap: 12px; justify-items: start; }
+.porque[data-step="0"] .pq-step[data-s="0"], .porque[data-step="1"] .pq-step[data-s="1"], .porque[data-step="2"] .pq-step[data-s="2"],
+.porque[data-step="3"] .pq-step[data-s="3"], .porque[data-step="4"] .pq-step[data-s="4"] { opacity: 1; transform: translateY(-50%); pointer-events: auto; }
+.pq-step h2 { font-size: clamp(2.3rem, 5.4vw, 4.4rem); }
+.pq-step .pq-big { font-size: clamp(2.3rem, 5.6vw, 4.8rem); }
+.pq-step p { color: #c9c6bd; font-size: clamp(1.05rem, 1.8vw, 1.3rem); max-width: 24em; }
+.pq-step p b { color: var(--star); }
+.pq-num { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); font-family: var(--font-display); font-weight: 800; font-size: 1.4rem; }
+
+.pq-vis { position: relative; width: 100%; max-width: 560px; justify-self: center; aspect-ratio: 1 / 1; border-radius: 26px; overflow: hidden; background: #ebe7df; box-shadow: 0 40px 80px -40px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.08); color: #1f2024; font-family: var(--font-body); }
+.pq-map { position: absolute; inset: 0; transition: filter .6s, transform .9s cubic-bezier(.2,.8,.2,1);
+  background-color: #ebe7df;
+  background-image:
+    radial-gradient(circle at 78% 82%, #cfe3c4 0 13%, transparent 13.5%),
+    radial-gradient(circle at 18% 22%, #d6e6f2 0 9%, transparent 9.5%),
+    linear-gradient(90deg, transparent 46%, #fff 46%, #fff 54%, transparent 54%),
+    linear-gradient(0deg, transparent 46%, #fff 46%, #fff 54%, transparent 54%),
+    linear-gradient(90deg, transparent 49%, #f6f3ee 49%, #f6f3ee 51%, transparent 51%),
+    linear-gradient(0deg, transparent 49%, #f6f3ee 49%, #f6f3ee 51%, transparent 51%);
+  background-size: 100% 100%, 100% 100%, 50% 50%, 50% 50%, 25% 25%, 25% 25%; }
+.pin { position: absolute; width: 22px; height: 22px; margin: -22px 0 0 -11px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: #ea4335; box-shadow: 0 4px 8px rgba(0,0,0,.25); transition: opacity .5s, filter .5s, transform .5s cubic-bezier(.2,1.4,.4,1); }
+.pin::after { content: ""; position: absolute; left: 7px; top: 7px; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+.pin.o { background: #8a8f98; }
+.st1 .pin.o { opacity: .12; transform: rotate(-45deg) scale(.7); }
+.st1 .pin.r { transform: rotate(-45deg) scale(1.2); }
+.st2 .pin.far { opacity: .12; transform: rotate(-45deg) scale(.7); }
+.me { position: absolute; left: 46%; top: 46%; width: 18px; height: 18px; margin: -9px; border-radius: 50%; background: #1a73e8; box-shadow: 0 0 0 5px rgba(26,115,232,.25), 0 0 0 2px #fff inset; opacity: 0; transform: scale(0); transition: opacity .3s, transform .5s cubic-bezier(.2,1.5,.4,1); }
+.ring { position: absolute; left: 46%; top: 46%; width: 70%; aspect-ratio: 1; transform: translate(-50%, -50%) scale(0); border-radius: 50%; border: 2px dashed rgba(26,115,232,.75); background: rgba(26,115,232,.08); transition: transform .8s cubic-bezier(.2,.9,.3,1.1) .1s; }
+.st2 .me { opacity: 1; transform: scale(1); }
+.st2 .ring { transform: translate(-50%, -50%) scale(1); }
+.st3 .pq-map { filter: blur(3px) brightness(.82); transform: scale(1.06); }
+
+.pq-search { position: absolute; left: 14px; right: 14px; top: 14px; display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 99px; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,.15); font-size: 1rem; transform: translateY(-140%); transition: transform .5s cubic-bezier(.2,1.2,.35,1); }
+.pq-search svg { width: 20px; height: 20px; flex: none; color: #5f6368; }
+.pq-search .q { display: inline-block; overflow: hidden; white-space: nowrap; width: 0; border-right: 2px solid #1a73e8; }
+.st1 .pq-search { transform: none; }
+.st1 .pq-search .q { animation: typeq 1s steps(17) .35s forwards, caret .8s step-end infinite; }
+@keyframes typeq { to { width: 17ch; } }
+@keyframes caret { 50% { border-color: transparent; } }
+
+.pq-cards { position: absolute; left: 14px; right: 14px; bottom: 14px; height: calc(2 * 92px + 10px); opacity: 0; transform: translateY(40px); transition: opacity .4s, transform .55s cubic-bezier(.2,1.2,.35,1); }
+.st3 .pq-cards { opacity: 1; transform: none; }
+.pq-card { position: absolute; left: 0; right: 0; height: 92px; padding: 12px 14px; border-radius: 14px; background: #fff; box-shadow: 0 8px 20px rgba(0,0,0,.18); display: grid; gap: 2px; align-content: center; transition: transform .7s cubic-bezier(.3,1.25,.4,1), box-shadow .4s; }
+.pq-card b { font-size: 1.05rem; }
+.pq-card span { font-size: .95rem; color: #f2a600; letter-spacing: 1px; }
+.pq-card span em { font-style: normal; color: #1f2024; letter-spacing: 0; margin-right: 4px; font-weight: 700; }
+.pq-card .cnt { font-style: normal; color: #5f6368; letter-spacing: 0; margin-left: 4px; padding: 1px 6px; border-radius: 6px; transition: background-color .4s, color .4s; }
+.pq-card small { color: #188038; font-size: .82rem; }
+.pq-card u { position: absolute; right: 12px; top: 10px; text-decoration: none; font-size: .62rem; letter-spacing: .06em; text-transform: uppercase; color: #9aa0a6; }
+.pq-card.a { transform: translateY(0); }
+.pq-card.b { transform: translateY(102px); }
+/* el que tiene más reseñas sube al primer lugar */
+.st3 .pq-card.a { transform: translateY(102px); transition-delay: .9s; }
+.st3 .pq-card.b { transform: translateY(0); transition-delay: .9s; box-shadow: 0 0 0 2px #188038, 0 12px 26px rgba(0,0,0,.22); }
+.st3 .pq-card.b .cnt { background: #188038; color: #fff; transition-delay: .5s; }
+
+.pq-bubs { position: absolute; inset: 0; pointer-events: none; }
+.pq-bubs span { position: absolute; padding: 8px 12px; border-radius: 12px; background: #fff; color: #1f2024; font-size: .86rem; font-weight: 600; box-shadow: 0 10px 24px rgba(0,0,0,.2); opacity: 0; transform: translateY(16px) scale(.7); transition: opacity .3s, transform .5s cubic-bezier(.2,1.5,.4,1); white-space: nowrap; }
+.pq-bubs span:nth-child(1) { left: 8%; top: 24%; } .pq-bubs span:nth-child(2) { right: 7%; top: 34%; transition-delay: .25s; } .pq-bubs span:nth-child(3) { left: 16%; top: 44%; transition-delay: .5s; }
+.st4 .pq-bubs span { opacity: 1; transform: none; }
+
+.pq-cue { position: absolute; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); display: grid; justify-items: center; gap: 6px; color: var(--muted); font-size: .8rem; transition: opacity .3s; }
+.pq-cue i { width: 22px; height: 34px; border: 1.5px solid rgba(255,255,255,.4); border-radius: 99px; position: relative; }
+.pq-cue i::after { content: ""; position: absolute; left: 50%; top: 6px; width: 4px; height: 7px; margin-left: -2px; border-radius: 3px; background: #fff; animation: cue 1.4s ease-in-out infinite; }
+.st1 .pq-cue { opacity: 0; }
+
+@media (min-width: 900px) {
+  .pq-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; }
+  .pq-vis { max-height: 74svh; max-width: min(560px, 74svh); }
+}
+@media (max-width: 899px) {
+  .sec.porque { height: 460vh; padding: 0; }
+  .pq-pin { align-items: stretch; padding-bottom: 16px; }
+  .pq-grid { grid-template-rows: auto minmax(0, 1fr); gap: 10px; align-items: start; padding-top: 12px; }
+  .pq-copy { min-height: 9.5em; }
+  .pq-step { top: 0; transform: translateY(24px); }
+  .porque[data-step="0"] .pq-step[data-s="0"], .porque[data-step="1"] .pq-step[data-s="1"], .porque[data-step="2"] .pq-step[data-s="2"],
+  .porque[data-step="3"] .pq-step[data-s="3"], .porque[data-step="4"] .pq-step[data-s="4"] { transform: none; }
+  .pq-step { gap: 8px; }
+  .pq-step h2, .pq-step .pq-big { font-size: clamp(1.8rem, 8.4vw, 2.5rem); }
+  .pq-num { width: 38px; height: 38px; font-size: 1.15rem; }
+  .pq-vis { aspect-ratio: auto; height: 100%; max-height: 52svh; align-self: end; border-radius: 20px; }
+  .pq-cards { height: calc(2 * 82px + 8px); }
+  .pq-card { height: 82px; padding: 10px 12px; }
+  .pq-card.b, .st3 .pq-card.a { transform: translateY(90px); }
+  .pq-cue { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pq-step, .pin, .me, .ring, .pq-search, .pq-cards, .pq-card, .pq-bubs span, .pq-map { transition: none; }
+  .st1 .pq-search .q { animation: none; width: 17ch; }
+}
 </style>
 
 </head>
@@ -478,6 +575,35 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
 </div><div class="prog" id="prog" aria-hidden="true"></div></header>
 <nav class="dots" id="dots" aria-label="Secciones de la página"></nav>
 <main>
+  <section class="sec porque" id="por-que" data-nombre="Por qué" data-step="0" aria-label="Por qué Google muestra un restaurante primero">
+    <div class="pq-pin">
+      <div class="wrap pq-grid">
+        <div class="pq-copy">
+          <div class="pq-step" data-s="0"><h2 class="pq-big">¿Por qué Google muestra un restaurante <em>primero</em> y no otro?</h2></div>
+          <div class="pq-step" data-s="1"><span class="pq-num">1</span><h2>Relevancia</h2><p>Qué tan bien coincide con lo que buscaron.</p></div>
+          <div class="pq-step" data-s="2"><span class="pq-num">2</span><h2>Distancia</h2><p>Qué tan cerca está de quien busca.</p></div>
+          <div class="pq-step" data-s="3"><span class="pq-num">3</span><h2>Qué tan conocido es</h2><p>Y para eso cuentan las <b>reseñas</b>: cuántas tiene y qué puntaje.</p></div>
+          <div class="pq-step" data-s="4"><h2 class="pq-big">No se puede <em>pagar</em> para subir.</h2><p>Lo dice Google. Lo que sí podés hacer es sumar reseñas de tus clientes.</p></div>
+        </div>
+        <div class="pq-vis" aria-hidden="true">
+          <div class="pq-map">
+            <i class="pin r" style="left:22%;top:30%"></i><i class="pin r far" style="left:80%;top:22%"></i><i class="pin o" style="left:64%;top:40%"></i>
+            <i class="pin r" style="left:44%;top:58%"></i><i class="pin o" style="left:16%;top:70%"></i><i class="pin r far" style="left:86%;top:76%"></i>
+            <i class="pin o" style="left:34%;top:18%"></i><i class="pin r" style="left:60%;top:66%"></i>
+            <span class="me"></span><span class="ring"></span>
+          </div>
+          <div class="pq-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><span class="q">restaurante cerca</span></div>
+          <div class="pq-cards">
+            <div class="pq-card a"><b>Bodegón del Puerto</b><span><em>4,9</em> ★★★★★ <i class="cnt">(26)</i></span><small>Restaurante · Abierto</small><u>Ejemplo</u></div>
+            <div class="pq-card b"><b>La Parrilla de Rosa</b><span><em>4,6</em> ★★★★★ <i class="cnt">(812)</i></span><small>Restaurante · Abierto</small><u>Ejemplo</u></div>
+          </div>
+          <div class="pq-bubs"><span>★★★★★ ¡Riquísimo!</span><span>★★★★★ Volvemos seguro</span><span>★★★★★ Excelente atención</span></div>
+        </div>
+      </div>
+      <div class="pq-cue"><span>Bajá</span><i></i></div>
+    </div>
+  </section>
+
   <section class="sec portada" id="inicio" data-nombre="Inicio">
     <div class="demo" id="demo" role="img" aria-label="Animación: un celular se acerca a la placa de bambú, la escanea, le salta un aviso y deja la reseña de 5 estrellas.">
       <img class="demo-blur" src="img/taco_bambu_negra_34.jpg" alt="" aria-hidden="true">
@@ -1451,8 +1577,26 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
   (function () {
     var bar = document.querySelector(".float-bar"); if (!bar) return;
     var on = null;
-    function check() { var v = window.pageYOffset > window.innerHeight * 0.45; if (v !== on) { on = v; bar.classList.toggle("shown", v); } }
+    var pq = document.getElementById("por-que");
+    /* aparece cuando termina la entrada (así no tapa el mapa) */
+    function check() { var lim = pq ? pq.offsetTop + pq.offsetHeight - window.innerHeight * 0.6 : window.innerHeight * 0.45, v = window.pageYOffset > lim; if (v !== on) { on = v; bar.classList.toggle("shown", v); } }
     window.addEventListener("scroll", check, { passive: true }); check();
+  })();
+  /* ---------------- Entrada: por qué Google muestra a uno primero (5 pasos según el scroll) ---------------- */
+  (function () {
+    var sec = $("#por-que"); if (!sec) return;
+    var cur = -1, ticking = false;
+    function update() {
+      ticking = false;
+      var r = sec.getBoundingClientRect(), span = r.height - window.innerHeight;
+      if (r.bottom < 0 || r.top > window.innerHeight) return;
+      var k = Math.min(4, Math.max(0, Math.floor(Math.max(0, -r.top) / span * 5)));
+      if (k === cur) return; cur = k;
+      sec.setAttribute("data-step", k);
+      for (var i = 1; i <= 4; i++) sec.classList.toggle("st" + i, k >= i);
+    }
+    window.addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+    window.addEventListener("resize", update); update();
   })();
 })();
 </script>
