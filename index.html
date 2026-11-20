@@ -749,6 +749,24 @@ html { scroll-behavior: auto !important; }
 .nav-veil.on { opacity: 1; }
 .nav-in > * { animation: navIn .55s cubic-bezier(.2,.8,.2,1) both; }
 @keyframes navIn { from { opacity: 0; transform: translateY(28px) scale(.985); } }
+
+/* carrito estilo tienda */
+.cart-list .ci { counter-increment: none; display: grid; grid-template-columns: 64px 1fr auto; align-items: start; gap: 12px; padding: 10px; }
+.cart-list .ci::before { display: none; }
+.ci img { width: 64px; height: 64px; border-radius: 10px; object-fit: cover; background: #222; }
+.ci-info { display: grid; gap: 3px; min-width: 0; }
+.ci-info b { font-size: .95rem; line-height: 1.2; }
+.ci-info small { color: var(--muted); font-size: .8rem; }
+.ci-row { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
+.ci-qty { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 99px; overflow: hidden; }
+.ci-qty button { width: 32px; height: 30px; border: 0; background: rgba(255,255,255,.08); color: inherit; font-size: 1rem; cursor: pointer; }
+.ci-qty span { min-width: 30px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ci-del { background: none; border: 0; color: var(--muted); font: inherit; font-size: .82rem; text-decoration: underline; cursor: pointer; padding: 0; }
+.ci-price { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cart-pill.empty { background: rgba(255,255,255,.12); color: inherit; }
+.cd-pend { display: grid; gap: 10px; padding: 12px; border-radius: 14px; border: 1px dashed var(--line); font-size: .92rem; }
+.cd-pend .btn { width: 100%; justify-content: center; }
+.cd-foot { position: sticky; bottom: calc(-20px - env(safe-area-inset-bottom, 0px)); background: #151513; padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px)); margin-bottom: calc(-20px - env(safe-area-inset-bottom, 0px)); }
 </style>
 
 </head>
@@ -760,12 +778,13 @@ html { scroll-behavior: auto !important; }
     <a href="#pedido">Armá tu pedido</a>
     <a href="#preguntas">Preguntas</a>
   </nav>
-<button type="button" class="cart-pill" id="cart-pill" hidden aria-label="Ver carrito" aria-controls="cart-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20.5" r="1.3"/><circle cx="17" cy="20.5" r="1.3"/></svg><b id="cart-n">0</b></button></div><div class="prog" id="prog" aria-hidden="true"></div></header>
+<button type="button" class="cart-pill" id="cart-pill" aria-label="Ver carrito" aria-controls="cart-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20.5" r="1.3"/><circle cx="17" cy="20.5" r="1.3"/></svg><b id="cart-n">0</b></button></div><div class="prog" id="prog" aria-hidden="true"></div></header>
 <div class="cd-back" id="cd-back" hidden></div>
 <aside class="cart-drawer" id="cart-drawer" role="dialog" aria-modal="true" aria-label="Tu carrito" hidden>
   <div class="cd-head"><b>Tu carrito</b><button type="button" class="cd-close" id="cd-close" aria-label="Cerrar">×</button></div>
   <ol class="cart-list" id="cd-list"></ol>
   <p class="cd-empty" id="cd-empty" hidden>Tu carrito está vacío.</p>
+  <div class="cd-pend" id="cd-pend" hidden><span id="cd-pend-t"></span><button type="button" class="btn btn-add" id="cd-pend-add">+ Agregar al carrito</button></div>
   <div class="cd-foot" id="cd-foot">
     <div><div class="cart-total" id="cd-total">$0</div><div class="buy-sub" id="cd-sub"></div></div>
     <a class="btn btn-wa" data-wa="cart" id="cd-send" target="_blank" rel="noopener" href="#">Enviar pedido por WhatsApp</a>
@@ -1131,26 +1150,30 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     }
     return t + ". Total: " + pesos(total());
   }
-  /* ---------- carrito ---------- */
+  /* ---------- carrito (una línea por producto) ---------- */
+  /* cada vez que entrás a la web el carrito arranca vacío (no se guarda) */
   var cart = [];
-  try { cart = JSON.parse(localStorage.getItem("nfc-carrito") || "[]") || []; } catch (e) { cart = []; }
-  function saveCart() { try { localStorage.setItem("nfc-carrito", JSON.stringify(cart)); } catch (e) {} }
+  try { localStorage.removeItem("nfc-carrito"); } catch (e) {}
+  /* carritos guardados con el formato anterior (negra + blanca en una línea) se separan por color */
+  cart = cart.reduce(function (o, it) {
+    if (it && it.color) { o.push(it); return o; }
+    if (!it) return o;
+    ["negra", "blanca"].forEach(function (c) { if (it[c]) o.push({ stand: it.stand, color: c, qty: it[c], logo: !!it.logo, name: it.name || "" }); });
+    return o;
+  }, []);
+  function saveCart() {}
   var standName = function (id) { var x = CONFIG.soportes.filter(function (s) { return s.id === id; })[0]; return x ? x.nombre : id; };
   var standExtra = function (id) { return { bambu: PRECIO_BAMBU, pino: PRECIO_PINO, quemado: PRECIO_QUEMADO }[id] || 0; };
-  function itemN(it) { return it.negra + it.blanca; }
-  function itemText(it) {
-    var a = [];
-    if (it.negra) a.push(it.negra + (it.negra === 1 ? " negra" : " negras"));
-    if (it.blanca) a.push(it.blanca + (it.blanca === 1 ? " blanca" : " blancas"));
-    return a.join(" + ") + ", soporte de " + standName(it.stand).toLowerCase() + (it.logo ? ", con logo grabado" : "");
-  }
-  function cartN() { return cart.reduce(function (t, it) { return t + itemN(it); }, 0); }
-  function cartTotal() {
-    var n = cartN();
-    if (!n) return 0;
-    var byWood = {}; cart.forEach(function (it) { byWood[it.stand] = (byWood[it.stand] || 0) + itemN(it); });
-    var cards = 0; for (var w in byWood) cards += byWood[w] * base(n, w) / n;
-    return Math.round(cards / 10) * 10 + cart.reduce(function (t, it) { return t + itemN(it) * (standExtra(it.stand) + (it.logo ? CONFIG.extraLogo : 0)); }, 0);
+  function itemN(it) { return it.qty; }
+  function itemTitle(it) { return "Placa " + (it.color === "negra" ? "negra" : "blanca") + " + soporte de " + standName(it.stand).toLowerCase(); }
+  function itemText(it) { return it.qty + " × " + itemTitle(it).toLowerCase().replace("placa ", "placa ") + (it.logo ? ", con logo grabado" : ""); }
+  function cartN() { return cart.reduce(function (t, it) { return t + it.qty; }, 0); }
+  /* precio por cantidad sobre el total del carrito; cada placa paga el valor medio de su madera a esa cantidad */
+  function linePrice(it) { var n = cartN(); return n ? it.qty * base(n, it.stand) / n + it.qty * (standExtra(it.stand) + (it.logo ? CONFIG.extraLogo : 0)) : 0; }
+  function cartTotal() { var t = cart.reduce(function (a, it) { return a + linePrice(it); }, 0); return Math.round(t / 10) * 10; }
+  function addLine(l) {
+    var same = cart.filter(function (it) { return it.stand === l.stand && it.color === l.color && it.logo === l.logo && (it.name || "") === (l.name || ""); })[0];
+    if (same) same.qty += l.qty; else cart.push(l);
   }
   function cartMsg() {
     var n = cartN(), L = ["Hola! Quiero hacer este pedido:"], local = "", logo = false;
@@ -1160,29 +1183,41 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     if (logo && state.img) L.push("Te mando el logo por acá.");
     return L.join("\n");
   }
+  function fillList(ol) {
+    ol.innerHTML = "";
+    cart.forEach(function (it, i) {
+      var li = document.createElement("li"); li.className = "ci";
+      var im = document.createElement("img"); im.src = "img/taco_" + it.stand + "_" + it.color + "_34.jpg"; im.alt = ""; im.loading = "lazy"; li.appendChild(im);
+      var info = document.createElement("div"); info.className = "ci-info";
+      var t = document.createElement("b"); t.textContent = itemTitle(it); info.appendChild(t);
+      var sub = document.createElement("small"); sub.textContent = it.logo ? "Con logo grabado" + (it.name ? " · " + it.name : "") : "Sin grabado"; info.appendChild(sub);
+      var row = document.createElement("div"); row.className = "ci-row";
+      var q = document.createElement("div"); q.className = "ci-qty";
+      var m = document.createElement("button"); m.type = "button"; m.textContent = it.qty > 1 ? "−" : "🗑"; m.setAttribute("aria-label", it.qty > 1 ? "Una menos" : "Quitar");
+      var v = document.createElement("span"); v.textContent = it.qty;
+      var p = document.createElement("button"); p.type = "button"; p.textContent = "+"; p.setAttribute("aria-label", "Una más");
+      m.addEventListener("click", function () { if (it.qty > 1) it.qty--; else cart.splice(i, 1); saveCart(); refreshUI(); });
+      p.addEventListener("click", function () { it.qty = Math.min(999, it.qty + 1); saveCart(); refreshUI(); });
+      q.appendChild(m); q.appendChild(v); q.appendChild(p); row.appendChild(q);
+      var x = document.createElement("button"); x.type = "button"; x.className = "ci-del"; x.textContent = "Quitar";
+      x.addEventListener("click", function () { cart.splice(i, 1); saveCart(); refreshUI(); });
+      row.appendChild(x); info.appendChild(row); li.appendChild(info);
+      var pr = document.createElement("div"); pr.className = "ci-price"; pr.textContent = pesos(Math.round(linePrice(it) / 10) * 10); li.appendChild(pr);
+      ol.appendChild(li);
+    });
+  }
   function renderCart() {
     var n = cartN(), box = $("#cart-box"), pill = $("#cart-pill");
-    box.hidden = !cart.length; if (pill) { pill.hidden = !cart.length && $("#cart-drawer").hidden; $("#cart-n").textContent = n; }
-    var ol = $("#cart-list"); ol.innerHTML = "";
-    cart.forEach(function (it, i) {
-      var li = document.createElement("li");
-      var t = document.createElement("span"); t.textContent = itemText(it); li.appendChild(t);
-      var x = document.createElement("button"); x.type = "button"; x.className = "cart-x"; x.textContent = "×"; x.setAttribute("aria-label", "Quitar del carrito");
-      x.addEventListener("click", function () { cart.splice(i, 1); saveCart(); refreshUI(); });
-      li.appendChild(x); ol.appendChild(li);
-    });
-    var dl = $("#cd-list"); dl.innerHTML = "";
-    cart.forEach(function (it, i) {
-      var li = document.createElement("li"), t = document.createElement("span"); t.textContent = itemText(it); li.appendChild(t);
-      var x = document.createElement("button"); x.type = "button"; x.className = "cart-x"; x.textContent = "×"; x.setAttribute("aria-label", "Quitar del carrito");
-      x.addEventListener("click", function () { cart.splice(i, 1); saveCart(); refreshUI(); });
-      li.appendChild(x); dl.appendChild(li);
-    });
+    box.hidden = !cart.length;
+    if (pill) { pill.hidden = false; $("#cart-n").textContent = n; pill.classList.toggle("empty", !n); }
+    fillList($("#cart-list")); fillList($("#cd-list"));
+    var sub = n + (n === 1 ? " tarjeta con su soporte" : " tarjetas con sus " + n + " soportes") + (n >= 5 ? " · precio por cantidad" : "");
+    $("#cart-total").textContent = $("#cd-total").textContent = pesos(cartTotal());
+    $("#cart-sub").textContent = $("#cd-sub").textContent = sub;
     $("#cd-empty").hidden = !!cart.length; $("#cd-foot").hidden = !cart.length;
-    $("#cd-total").textContent = pesos(cartTotal());
-    $("#cart-total").textContent = pesos(cartTotal());
-    $("#cd-sub").textContent = $("#cart-sub").textContent = n + (n === 1 ? " tarjeta con su soporte" : " tarjetas con sus " + n + " soportes") + (n >= 5 ? " · precio por cantidad" : "");
-    var add = $("#add-btn"); add.disabled = !count();
+    var c = count(), pend = $("#cd-pend");
+    if (pend) { pend.hidden = !c; if (c) $("#cd-pend-t").textContent = "Tenés armado: " + cardsText() + " con soporte de " + standOf().nombre.toLowerCase() + " (" + pesos(total()) + ")"; }
+    $("#add-btn").disabled = !c;
     $("#buy-btn").hidden = !!cart.length;
   }
   function waLink(kind) {
@@ -1232,7 +1267,7 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
   }
   $("#add-btn").addEventListener("click", function () {
     if (!count()) return;
-    cart.push({ negra: state.q.negra, blanca: state.q.blanca, stand: state.stand, logo: !!withLogo(), name: withLogo() ? state.name.trim() : "" });
+    ["negra", "blanca"].forEach(function (c) { if (state.q[c]) addLine({ stand: state.stand, color: c, qty: state.q[c], logo: !!withLogo(), name: withLogo() ? state.name.trim() : "" }); });
     saveCart(); refreshUI();
     var b = $("#add-btn"); b.classList.remove("added"); void b.offsetWidth; b.classList.add("added"); b.textContent = "✓ Agregado";
     var pill = $("#cart-pill"); if (pill) { pill.classList.remove("bump"); void pill.offsetWidth; pill.classList.add("bump"); }
@@ -1253,6 +1288,7 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     bk.addEventListener("click", function () { open(false); });
     $("#cd-more").addEventListener("click", function () { open(false); });
     $("#cd-clear").addEventListener("click", function () { cart = []; saveCart(); refreshUI(); });
+    $("#cd-pend-add").addEventListener("click", function () { $("#add-btn").click(); });
     document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !dr.hidden) open(false); });
   })();
   function set(key, val) { state[key] = val; refreshUI(); viewer.rebuild(false); if (key === "logo") { viewer.look(val); if (val) viewer.burn(true); } }
