@@ -698,6 +698,28 @@ html { scrollbar-width: none; } html::-webkit-scrollbar { display: none; }
   .pq-vis { align-self: start; width: min(100%, 54svh); }
   .pq-step { top: auto; bottom: 0; }
 }
+
+/* carrito */
+.buy-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-add { background: #fff; color: #111; border: 0; }
+.btn-add:disabled { opacity: .45; cursor: not-allowed; }
+.btn-add.added { animation: addPop .45s ease; background: #e8f7ee; color: #188038; }
+@keyframes addPop { 40% { transform: scale(1.07); } }
+.cart-box { margin-top: 16px; padding: 16px; border-radius: 18px; background: rgba(255,255,255,.06); border: 1px solid var(--line); animation: cartIn .35s ease; }
+@keyframes cartIn { from { opacity: 0; transform: translateY(10px); } }
+.cart-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 1.05rem; }
+.cart-clear { background: none; border: 0; color: var(--muted); font: inherit; font-size: .85rem; cursor: pointer; text-decoration: underline; }
+.cart-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; counter-reset: c; }
+.cart-list li { counter-increment: c; display: flex; align-items: center; gap: 10px; padding: 9px 10px 9px 12px; border-radius: 12px; background: rgba(255,255,255,.06); font-size: .95rem; }
+.cart-list li::before { content: counter(c); flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #111; font-weight: 700; font-size: .78rem; }
+.cart-list li span { flex: 1; }
+.cart-x { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 0; background: rgba(255,255,255,.1); color: inherit; font-size: 1.2rem; line-height: 1; cursor: pointer; }
+.cart-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.cart-total { font-family: var(--font-display); font-weight: 800; font-size: 2.4rem; line-height: .95; font-variant-numeric: tabular-nums; }
+.cart-pill { display: inline-flex; align-items: center; gap: 6px; margin-left: 12px; padding: 7px 12px; border-radius: 99px; background: var(--accent); color: #111; font-weight: 700; text-decoration: none; }
+.cart-pill svg { width: 18px; height: 18px; }
+.cart-pill.bump { animation: addPop .45s ease; }
+@media (max-width: 899px) { .buy-btns { flex: 1 1 100%; } .buy-btns .btn, .cart-foot .btn { flex: 1 1 100%; } .cart-pill { margin-left: auto; } }
 </style>
 
 </head>
@@ -709,7 +731,7 @@ html { scrollbar-width: none; } html::-webkit-scrollbar { display: none; }
     <a href="#pedido">Armá tu pedido</a>
     <a href="#preguntas">Preguntas</a>
   </nav>
-</div><div class="prog" id="prog" aria-hidden="true"></div></header>
+<a class="cart-pill" id="cart-pill" href="#pedido" hidden aria-label="Ver carrito"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20.5" r="1.3"/><circle cx="17" cy="20.5" r="1.3"/></svg><b id="cart-n">0</b></a></div><div class="prog" id="prog" aria-hidden="true"></div></header>
 <div class="side-bar" aria-hidden="true"><i></i></div>
 <nav class="dots" id="dots" aria-label="Secciones de la página"></nav>
 <main>
@@ -905,7 +927,17 @@ html { scrollbar-width: none; } html::-webkit-scrollbar { display: none; }
           <div class="buy-sub" id="price-sub">3 tarjetas con sus 3 soportes</div>
           <span class="sr-only" id="price-live" aria-live="polite"></span>
         </div>
-        <a class="btn btn-wa" data-wa="config" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener" id="buy-btn">Pedir por WhatsApp</a>
+        <div class="buy-btns"><button type="button" class="btn btn-add" id="add-btn">+ Agregar al carrito</button>
+        <a class="btn btn-wa" data-wa="config" href="https://wa.me/59895833281?text=Hola!%20Quiero%20saber%20m%C3%A1s%20sobre%20las%20placas%20NFC%20para%20rese%C3%B1as%20de%20Google." target="_blank" rel="noopener" id="buy-btn">Pedir por WhatsApp</a></div>
+      </div>
+      <div class="cart-box" id="cart-box" hidden>
+        <div class="cart-head"><b>Tu carrito</b><button type="button" class="cart-clear" id="cart-clear">Vaciar</button></div>
+        <ol class="cart-list" id="cart-list"></ol>
+        <div class="cart-foot">
+          <div><div class="cart-total" id="cart-total">$0</div><div class="buy-sub" id="cart-sub"></div></div>
+          <a class="btn btn-wa" data-wa="cart" id="cart-send" target="_blank" rel="noopener" href="#">Enviar pedido por WhatsApp</a>
+        </div>
+        <p class="hint">El precio por cantidad se calcula sobre el total del carrito.</p>
       </div>
     </div>
   </div>
@@ -1048,7 +1080,50 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     }
     return t + ". Total: " + pesos(total());
   }
+  /* ---------- carrito ---------- */
+  var cart = [];
+  try { cart = JSON.parse(localStorage.getItem("nfc-carrito") || "[]") || []; } catch (e) { cart = []; }
+  function saveCart() { try { localStorage.setItem("nfc-carrito", JSON.stringify(cart)); } catch (e) {} }
+  var standName = function (id) { var x = CONFIG.soportes.filter(function (s) { return s.id === id; })[0]; return x ? x.nombre : id; };
+  var standExtra = function (id) { return { bambu: PRECIO_BAMBU, pino: PRECIO_PINO, quemado: PRECIO_QUEMADO }[id] || 0; };
+  function itemN(it) { return it.negra + it.blanca; }
+  function itemText(it) {
+    var a = [];
+    if (it.negra) a.push(it.negra + (it.negra === 1 ? " negra" : " negras"));
+    if (it.blanca) a.push(it.blanca + (it.blanca === 1 ? " blanca" : " blancas"));
+    return a.join(" + ") + ", soporte de " + standName(it.stand).toLowerCase() + (it.logo ? ", con logo grabado" : "");
+  }
+  function cartN() { return cart.reduce(function (t, it) { return t + itemN(it); }, 0); }
+  function cartTotal() {
+    var n = cartN();
+    return base(n) + cart.reduce(function (t, it) { return t + itemN(it) * (standExtra(it.stand) + (it.logo ? CONFIG.extraLogo : 0)); }, 0);
+  }
+  function cartMsg() {
+    var n = cartN(), L = ["Hola! Quiero hacer este pedido:"], local = "", logo = false;
+    cart.forEach(function (it, i) { L.push((i + 1) + ") " + itemText(it)); if (it.logo) { logo = true; if (it.name) local = it.name; } });
+    L.push("Total: " + n + (n === 1 ? " tarjeta" : " tarjetas") + " con soporte, " + pesos(cartTotal()));
+    if (local) L.push("Local: " + local);
+    if (logo && state.img) L.push("Te mando el logo por acá.");
+    return L.join("\n");
+  }
+  function renderCart() {
+    var n = cartN(), box = $("#cart-box"), pill = $("#cart-pill");
+    box.hidden = !cart.length; if (pill) { pill.hidden = !cart.length; $("#cart-n").textContent = n; }
+    var ol = $("#cart-list"); ol.innerHTML = "";
+    cart.forEach(function (it, i) {
+      var li = document.createElement("li");
+      var t = document.createElement("span"); t.textContent = itemText(it); li.appendChild(t);
+      var x = document.createElement("button"); x.type = "button"; x.className = "cart-x"; x.textContent = "×"; x.setAttribute("aria-label", "Quitar del carrito");
+      x.addEventListener("click", function () { cart.splice(i, 1); saveCart(); refreshUI(); });
+      li.appendChild(x); ol.appendChild(li);
+    });
+    $("#cart-total").textContent = pesos(cartTotal());
+    $("#cart-sub").textContent = n + (n === 1 ? " tarjeta con su soporte" : " tarjetas con sus " + n + " soportes") + (n >= 5 ? " · precio por cantidad" : "");
+    var add = $("#add-btn"); add.disabled = !count();
+    $("#buy-btn").hidden = !!cart.length;
+  }
   function waLink(kind) {
+    if (kind === "cart") return "https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(cartMsg());
     var msg = (kind === "general" || !count())
       ? "Hola! Quiero saber más sobre las placas NFC para reseñas de Google."
       : "Hola! Quiero pedir " + describe();
@@ -1087,10 +1162,21 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     $("#logo-thumb").hidden = $("#logo-del").hidden = !state.img;
     $("#logo-thumb").style.backgroundImage = state.img ? "url(" + state.img.src + ")" : "";
     $("#logo-btn").textContent = state.img ? "Cambiar logo" : "Subir logo";
+    renderCart();
     $$("[data-wa]").forEach(function (a) { a.href = waLink(a.dataset.wa); });
     /* Sin tarjetas, el botón de pedir deja de ser un link (así tampoco se activa con el teclado) */
     if (n === 0) $("#buy-btn").removeAttribute("href");
   }
+  $("#add-btn").addEventListener("click", function () {
+    if (!count()) return;
+    cart.push({ negra: state.q.negra, blanca: state.q.blanca, stand: state.stand, logo: !!withLogo(), name: withLogo() ? state.name.trim() : "" });
+    saveCart(); refreshUI();
+    var b = $("#add-btn"); b.classList.remove("added"); void b.offsetWidth; b.classList.add("added"); b.textContent = "✓ Agregado";
+    var pill = $("#cart-pill"); if (pill) { pill.classList.remove("bump"); void pill.offsetWidth; pill.classList.add("bump"); }
+    setTimeout(function () { b.textContent = "+ Agregar al carrito"; b.classList.remove("added"); }, 1400);
+    setTimeout(function () { var r = $("#cart-box").getBoundingClientRect(); if (r.top > innerHeight - 80) $("#cart-box").scrollIntoView({ behavior: "smooth", block: "nearest" }); }, 60);
+  });
+  $("#cart-clear").addEventListener("click", function () { cart = []; saveCart(); refreshUI(); });
   function set(key, val) { state[key] = val; refreshUI(); viewer.rebuild(false); if (key === "logo") { viewer.look(val); if (val) viewer.burn(true); } }
 
   CONFIG.soportes.forEach(function (s) {
