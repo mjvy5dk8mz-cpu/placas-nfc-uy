@@ -767,6 +767,16 @@ html { scroll-behavior: auto !important; }
 .cd-pend { display: grid; gap: 10px; padding: 12px; border-radius: 14px; border: 1px dashed var(--line); font-size: .92rem; }
 .cd-pend .btn { width: 100%; justify-content: center; }
 .cd-foot { position: sticky; bottom: calc(-20px - env(safe-area-inset-bottom, 0px)); background: #151513; padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px)); margin-bottom: calc(-20px - env(safe-area-inset-bottom, 0px)); }
+
+/* tocar rápido + y − no hace zoom ni mueve la pantalla */
+html { touch-action: manipulation; }
+button, .qty, .ci-qty, .seg, #swatches { touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+.q-in { width: 2.6em; min-width: 0; text-align: center; border: 0; border-radius: 8px; background: transparent; color: inherit; font: inherit; font-family: var(--font-display); font-weight: 800;
+  font-size: 16px; font-variant-numeric: tabular-nums; padding: 4px 0; -moz-appearance: textfield; }
+.qty .q-in { font-size: max(16px, 1.15rem); }
+.q-in:focus { outline: 2px solid var(--accent); background: rgba(255,255,255,.08); }
+.ci-qty .q-in { width: 34px; font-size: 16px; }
+input, select, textarea { font-size: max(16px, 1em); }
 </style>
 
 </head>
@@ -941,7 +951,7 @@ html { scroll-behavior: auto !important; }
             <span class="chip chip-negra" aria-hidden="true"></span><span class="cart-name">Negro mate</span>
             <div class="qty">
               <button type="button" id="menos-negra" data-q="negra" data-d="-1" aria-label="Quitar una tarjeta negra">−</button>
-              <output id="q-negra" aria-live="polite">2</output>
+              <input id="q-negra" class="q-in" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" value="2" aria-label="Cantidad de tarjetas negras" autocomplete="off">
               <button type="button" id="mas-negra" data-q="negra" data-d="1" aria-label="Sumar una tarjeta negra">+</button>
             </div>
           </div>
@@ -949,7 +959,7 @@ html { scroll-behavior: auto !important; }
             <span class="chip chip-blanca" aria-hidden="true"></span><span class="cart-name">Blanco mate</span>
             <div class="qty">
               <button type="button" id="menos-blanca" data-q="blanca" data-d="-1" aria-label="Quitar una tarjeta blanca">−</button>
-              <output id="q-blanca" aria-live="polite">1</output>
+              <input id="q-blanca" class="q-in" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" value="1" aria-label="Cantidad de tarjetas blancas" autocomplete="off">
               <button type="button" id="mas-blanca" data-q="blanca" data-d="1" aria-label="Sumar una tarjeta blanca">+</button>
             </div>
           </div>
@@ -1026,7 +1036,7 @@ html { scroll-behavior: auto !important; }
         <details open><summary>¿El cliente tiene que bajar una app?</summary><p>No. Acerca el celular a la tarjeta y le aparece un aviso que abre directo la página de reseñas de tu local.</p></details>
         <details><summary>¿Funciona con cualquier celular?</summary><p>Con los iPhone desde el XS en adelante y con casi todos los Android que tienen NFC, que es lo mismo que se usa para pagar con el celular.</p></details>
         <details><summary>¿Vienen listas para usar?</summary><p>Sí. Nos pasás tu negocio en Google Maps y te las entregamos programadas. Las sacás de la bolsa y las ponés en el mostrador.</p></details>
-        <details><summary>¿Cuánto salen?</summary><p id="faq-precios">Todas vienen con su soporte y el precio depende de la madera. Pino: 1 $550, 5 $2.100. Bambú o madera quemada: 1 $650, 5 $2.500. Cuantas más llevás, menos sale cada una. Es un pago único.</p></details>
+        <details><summary>¿Cuánto salen?</summary><p id="faq-precios">Todas vienen con su soporte y el precio depende de la madera. Pino: 1 $550, 5 $2.100. Bambú: 1 $650, 5 $2.500. Madera quemada: 1 $700, 5 $2.700. Cuantas más llevás, menos sale cada una. Es un pago único.</p></details>
         <details><summary>¿Pueden llevar el logo de mi local?</summary><p>Sí. Por <span data-extra>$100</span> más por soporte grabamos al frente el nombre o el logo de tu local. En <a href="#pedido">Armá tu pedido</a> podés probar cómo queda antes de pedir.</p></details>
         <details><summary>¿Qué soporte elijo?</summary><p>Los tres son de madera maciza y sin metal, así que no interfieren con el NFC. Bambú: laminado, de veta fina y tono cálido. Pino: más claro y liviano. Madera quemada: negra como el carbón, con la veta marcada (la técnica japonesa shou sugi ban), con un look moderno y pensado para combinar con la tarjeta negra. Los tres miden 72 × 72 × 24 mm y llevan una ranura fina inclinada 10° hacia atrás: la tarjeta queda parada y se ve el 93%. Con la tarjeta puesta miden unos 10 cm de alto y llevan patitas de goma abajo. Lo elegís en <a href="#pedido">Armá tu pedido</a>.</p></details>
         <details><summary>¿Hay que pagar algo por mes?</summary><p>No. Es un pago único. La tarjeta no lleva batería ni necesita mantenimiento.</p></details>
@@ -1083,9 +1093,9 @@ var CONFIG = {
   preciosMadera: {
     pino:    { 1: 550, 2: 1000, 3: 1450, 4: 1800, 5: 2100, extra: 400, extra10: 350 },
     bambu:   { 1: 650, 2: 1200, 3: 1700, 4: 2150, 5: 2500, extra: 450, extra10: 400 },
-    quemado: { 1: 650, 2: 1200, 3: 1700, 4: 2150, 5: 2500, extra: 450, extra10: 400 }
+    quemado: { 1: 700, 2: 1300, 3: 1850, 4: 2300, 5: 2700, extra: 500, extra10: 450 }
   },
-  precios: { 1: 650, 2: 1200, 3: 1700, 4: 2150, 5: 2500 },   // (referencia: bambú y quemada)   // Precio total según cantidad (siempre con soportes)
+  precios: { 1: 650, 2: 1200, 3: 1700, 4: 2150, 5: 2500 },   // (referencia: bambú)   // Precio total según cantidad (siempre con soportes)
   precioExtra: 450,                 // Cada tarjeta con soporte de la 6 a la 10
   precioExtra10: 400,               // Cada tarjeta con soporte desde la 11 en adelante
   extraLogo: 100,                   // Recargo por soporte con el logo o nombre del local
@@ -1120,7 +1130,7 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
   $$("[data-extra]").forEach(function (e) { e.textContent = pesos(CONFIG.extraLogo); });
   (function () {
     var M = CONFIG.preciosMadera, f = function (k, nom) { return nom + ": 1 " + pesos(M[k][1]) + ", 5 " + pesos(M[k][5]); };
-    $("#faq-precios").textContent = "Todas vienen con su soporte y el precio depende de la madera. " + f("pino", "Pino") + ". " + f("bambu", "Bambú o madera quemada") + ". Cuantas más llevás, menos sale cada una. Es un pago único.";
+    $("#faq-precios").textContent = "Todas vienen con su soporte y el precio depende de la madera. " + f("pino", "Pino") + ". " + f("bambu", "Bambú") + ". " + f("quemado", "Madera quemada") + ". Cuantas más llevás, menos sale cada una. Es un pago único.";
   })();
 
   function withLogo() { return state.logo && count() >= 1; }
@@ -1194,7 +1204,10 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
       var row = document.createElement("div"); row.className = "ci-row";
       var q = document.createElement("div"); q.className = "ci-qty";
       var m = document.createElement("button"); m.type = "button"; m.textContent = it.qty > 1 ? "−" : "🗑"; m.setAttribute("aria-label", it.qty > 1 ? "Una menos" : "Quitar");
-      var v = document.createElement("span"); v.textContent = it.qty;
+      var v = document.createElement("input"); v.className = "q-in"; v.type = "text"; v.inputMode = "numeric"; v.maxLength = 3; v.value = it.qty; v.setAttribute("aria-label", "Cantidad");
+      v.addEventListener("focus", function () { v.select(); });
+      v.addEventListener("change", function () { var k = Math.min(999, parseInt(v.value.replace(/\D/g, "") || "0", 10)); if (k) it.qty = k; else cart.splice(i, 1); refreshUI(); });
+      v.addEventListener("keydown", function (e) { if (e.key === "Enter") v.blur(); });
       var p = document.createElement("button"); p.type = "button"; p.textContent = "+"; p.setAttribute("aria-label", "Una más");
       m.addEventListener("click", function () { if (it.qty > 1) it.qty--; else cart.splice(i, 1); saveCart(); refreshUI(); });
       p.addEventListener("click", function () { it.qty = Math.min(999, it.qty + 1); saveCart(); refreshUI(); });
@@ -1242,7 +1255,7 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
   }
   function refreshUI() {
     var n = count();
-    $("#q-negra").textContent = state.q.negra; $("#q-blanca").textContent = state.q.blanca;
+    ["negra", "blanca"].forEach(function (c) { var el = $("#q-" + c); if (document.activeElement !== el) el.value = state.q[c]; });
     $("#menos-negra").disabled = !state.q.negra; $("#menos-blanca").disabled = !state.q.blanca;
     showPrice(total()); renderTiers();
     $("#price-sub").textContent = n === 0 ? "Sumá tarjetas con el + para armar tu pedido"
@@ -1291,6 +1304,17 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     $("#cd-pend-add").addEventListener("click", function () { $("#add-btn").click(); });
     document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !dr.hidden) open(false); });
   })();
+  ["negra", "blanca"].forEach(function (c) {
+    var el = $("#q-" + c), t;
+    el.addEventListener("focus", function () { el.select(); });
+    el.addEventListener("input", function () {
+      var d = el.value.replace(/\D/g, "").slice(0, 3); if (d !== el.value) el.value = d;
+      state.q[c] = Math.min(999, parseInt(d || "0", 10)); refreshUI();
+      clearTimeout(t); t = setTimeout(function () { viewer.rebuild(true); }, 250);
+    });
+    el.addEventListener("blur", function () { el.value = state.q[c]; });
+    el.addEventListener("keydown", function (e) { if (e.key === "Enter") el.blur(); });
+  });
   function set(key, val) { state[key] = val; refreshUI(); viewer.rebuild(false); if (key === "logo") { viewer.look(val); if (val) viewer.burn(true); } }
 
   CONFIG.soportes.forEach(function (s) {
