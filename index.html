@@ -565,7 +565,7 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
 .st2 .ring { transform: translate(-50%, -50%) scale(1); }
 .st3 .ring { transform: translate(-50%, -50%) scale(0); }
 /* 3: uno apagado y uno prendido */
-.st3 .ra { filter: brightness(.55) saturate(.35); }
+.st3 .bld.ra { filter: brightness(.55) saturate(.35); }
 .st3 .rb .wins i { background: #ffd27a radial-gradient(circle at 30% 78%, #6b3f1f 0 9%, transparent 10%) , radial-gradient(circle at 72% 80%, #6b3f1f 0 9%, transparent 10%); background-color: #ffd27a; box-shadow: inset 0 0 0 .6cqw #5a4a3c, 0 0 4cqw 1cqw rgba(255,190,90,.7); }
 .st3 .rb .door { background: #ffc965; box-shadow: inset 0 0 0 .5cqw #5a4a3c, 0 0 3cqw rgba(255,190,90,.6); }
 .st3 .rb::after { content: ""; position: absolute; left: -10%; right: -10%; top: 100%; height: 30%; background: radial-gradient(ellipse at 50% 0, rgba(255,200,110,.55), transparent 70%); }
@@ -602,7 +602,7 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
 .rb .wins i { background: #ffd27a radial-gradient(circle at 30% 78%, #6b3f1f 0 9%, transparent 10%), radial-gradient(circle at 72% 80%, #6b3f1f 0 9%, transparent 10%); background-color: #ffd27a; box-shadow: inset 0 0 0 .6cqw #5a4a3c, 0 0 4cqw 1cqw rgba(255,190,90,.7); }
 .rb .door { background: #ffc965; box-shadow: inset 0 0 0 .5cqw #5a4a3c, 0 0 3cqw rgba(255,190,90,.6); }
 .rb::after { content: ""; position: absolute; left: -10%; right: -10%; top: 100%; height: 30%; background: radial-gradient(ellipse at 50% 0, rgba(255,200,110,.5), transparent 70%); }
-.ra { filter: brightness(.82) saturate(.7); }
+.bld.ra { filter: brightness(.82) saturate(.7); }
 .garland { left: 51%; width: 31%; top: 43.5%; height: 3cqw; z-index: 2; border-top: .3cqw solid rgba(40,30,20,.6); border-radius: 0 0 50% 50% / 0 0 100% 100%;
   background: radial-gradient(circle, #ffe08a 0 .7cqw, rgba(255,214,120,.5) .9cqw, transparent 1.4cqw) 0 30% / 4cqw 100% repeat-x; animation: twinkle 1.6s ease-in-out infinite alternate; }
 @keyframes twinkle { to { filter: brightness(1.35); } }
@@ -621,6 +621,37 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
 .crowd .per { bottom: 31%; }
 .crowd .q1 { left: 63%; } .crowd .q2 { left: 69%; }
 .crowd .hd { animation: chat 2s ease-in-out infinite; } .crowd .q2 .hd { animation-delay: -.8s; }
+
+/* toda la gente camina con el celu, se frena a mirarlo (ve las reseñas) y entra al lleno */
+.pq-vis .wk { left: -8%; animation: goB 7s linear infinite; }
+.pq-vis .wk .lg { animation: wleg 7s linear infinite; }
+.pq-vis .wk .lg.r { animation-name: wlegR; }
+.pq-vis .w2 { animation-name: goB2; animation-delay: -1.4s; } .pq-vis .w2 .lg, .pq-vis .w2 .ph, .pq-vis .w2 .look { animation-delay: -1.4s; }
+.pq-vis .w3 { animation-delay: -2.8s; } .pq-vis .w3 .lg, .pq-vis .w3 .ph, .pq-vis .w3 .look { animation-delay: -2.8s; }
+.pq-vis .w4 { animation-name: goB2; animation-delay: -4.2s; } .pq-vis .w4 .lg, .pq-vis .w4 .ph, .pq-vis .w4 .look { animation-delay: -4.2s; }
+.pq-vis .w5 { animation-delay: -5.6s; } .pq-vis .w5 .lg, .pq-vis .w5 .ph, .pq-vis .w5 .look { animation-delay: -5.6s; }
+@keyframes goB { 0% { left: -8%; opacity: 1; transform: none; } 34%, 56% { left: 36%; } 86% { left: 66.5%; opacity: 1; transform: none; } 95%, 100% { left: 66.5%; opacity: 0; transform: translateY(-1.5cqw) scale(.8); } }
+@keyframes goB2 { 0% { left: 108%; opacity: 1; transform: none; } 34%, 56% { left: 92%; } 86% { left: 66.5%; opacity: 1; transform: none; } 95%, 100% { left: 66.5%; opacity: 0; transform: translateY(-1.5cqw) scale(.8); } }
+.pq-vis .wk .ph, .crowd .ph { animation: phUp 7s linear infinite; }
+.crowd .ph { animation: none; right: 10%; top: 8%; box-shadow: 0 0 0 .3cqw #ddd inset, 0 0 2cqw rgba(140,190,255,.9); }
+@keyframes phUp { 0%, 30%, 60%, 100% { right: -16%; top: 38%; box-shadow: 0 0 0 .3cqw #ddd inset; } 36%, 54% { right: 8%; top: 8%; box-shadow: 0 0 0 .3cqw #ddd inset, 0 0 2.4cqw rgba(140,190,255,.95); } }
+.look { left: 50%; bottom: 112%; transform: translateX(-50%) scale(0); padding: .8cqw 1.6cqw; border-radius: 99px; background: #fff; color: #188038; font-style: normal; font-size: 2.7cqw; font-weight: 700; white-space: nowrap; box-shadow: 0 .8cqw 1.6cqw rgba(0,0,0,.3); animation: lookUp 7s linear infinite; }
+@keyframes lookUp { 0%, 36%, 58%, 100% { transform: translateX(-50%) scale(0); } 40%, 54% { transform: translateX(-50%) scale(1); } }
+.crowd .q1 { left: 61%; } .crowd .q2 { left: 72%; }
+
+/* el otro: se nota que es un restaurante, pero apagado y vacío */
+.pq-vis .bld.ra { filter: grayscale(.75) brightness(.62); opacity: .9; }
+.st3 .bld.ra { filter: grayscale(.85) brightness(.48); }
+.ra .wins i { background: #262a33 radial-gradient(ellipse at 50% 85%, #3a3f4b 0 22%, transparent 23%); }
+.ra .awn { opacity: .75; }
+.board { left: 21.5%; bottom: 29%; width: 4.4cqw; height: 6cqw; z-index: 2; filter: grayscale(.6) brightness(.7); }
+.board::before { content: ""; position: absolute; inset: 0; border-radius: .4cqw; background: #2d3a33; box-shadow: inset 0 0 0 .5cqw #7a5a3c; }
+.board i { left: 22%; right: 22%; top: 25%; height: 1.8cqw; background: repeating-linear-gradient(#cfd8d0 0 .25cqw, transparent .25cqw .7cqw); opacity: .6; }
+.chair { bottom: 29.5%; width: 2.4cqw; height: 3.8cqw; margin-left: -1.2cqw; z-index: 1; border-left: .5cqw solid #8d867a; border-bottom: .5cqw solid #8d867a; opacity: .75; }
+.chair.c-b { transform: scaleX(-1); }
+@media (prefers-reduced-motion: reduce) { .pq-vis .wk { display: none; } }
+@keyframes wleg { 0.0% { transform: rotate(24deg); } 3.2% { transform: rotate(-24deg); } 6.4% { transform: rotate(24deg); } 9.6% { transform: rotate(-24deg); } 12.8% { transform: rotate(24deg); } 16.0% { transform: rotate(-24deg); } 19.2% { transform: rotate(24deg); } 22.4% { transform: rotate(-24deg); } 25.6% { transform: rotate(24deg); } 28.8% { transform: rotate(-24deg); } 32.0% { transform: rotate(24deg); } 35.2% { transform: rotate(0deg); } 38.4% { transform: rotate(0deg); } 41.6% { transform: rotate(0deg); } 44.8% { transform: rotate(0deg); } 48.0% { transform: rotate(0deg); } 51.2% { transform: rotate(0deg); } 54.4% { transform: rotate(0deg); } 57.6% { transform: rotate(24deg); } 60.8% { transform: rotate(-24deg); } 64.0% { transform: rotate(24deg); } 67.2% { transform: rotate(-24deg); } 70.4% { transform: rotate(24deg); } 73.6% { transform: rotate(-24deg); } 76.8% { transform: rotate(24deg); } 80.0% { transform: rotate(-24deg); } 83.2% { transform: rotate(24deg); } 86.4% { transform: rotate(0deg); } 89.6% { transform: rotate(0deg); } 92.8% { transform: rotate(0deg); } 96.0% { transform: rotate(0deg); } 99.2% { transform: rotate(0deg); } }
+@keyframes wlegR { 0.0% { transform: rotate(-24deg); } 3.2% { transform: rotate(24deg); } 6.4% { transform: rotate(-24deg); } 9.6% { transform: rotate(24deg); } 12.8% { transform: rotate(-24deg); } 16.0% { transform: rotate(24deg); } 19.2% { transform: rotate(-24deg); } 22.4% { transform: rotate(24deg); } 25.6% { transform: rotate(-24deg); } 28.8% { transform: rotate(24deg); } 32.0% { transform: rotate(-24deg); } 35.2% { transform: rotate(0deg); } 38.4% { transform: rotate(0deg); } 41.6% { transform: rotate(0deg); } 44.8% { transform: rotate(0deg); } 48.0% { transform: rotate(0deg); } 51.2% { transform: rotate(0deg); } 54.4% { transform: rotate(0deg); } 57.6% { transform: rotate(-24deg); } 60.8% { transform: rotate(24deg); } 64.0% { transform: rotate(-24deg); } 67.2% { transform: rotate(24deg); } 70.4% { transform: rotate(-24deg); } 73.6% { transform: rotate(24deg); } 76.8% { transform: rotate(-24deg); } 80.0% { transform: rotate(24deg); } 83.2% { transform: rotate(-24deg); } 86.4% { transform: rotate(0deg); } 89.6% { transform: rotate(0deg); } 92.8% { transform: rotate(0deg); } 96.0% { transform: rotate(0deg); } 99.2% { transform: rotate(0deg); } }
 
 @media (min-width: 900px) {
   .pq-grid { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 48px; }
@@ -679,18 +710,22 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
           <div class="bld shop s2"><span class="win"></span><span class="door"></span></div>
           <div class="walkway"></div>
           <span class="garland"></span>
+          <div class="board"><i></i></div>
+          <i class="chair c-a" style="left:28.5%"></i><i class="chair c-b" style="left:37.5%"></i>
           <div class="tbl t0" style="left:33%"><i class="top"></i><i class="leg"></i></div>
           <div class="tbl t1" style="left:57%"><span class="sit" style="--shirt:#e0507a"><i class="bd"></i><i class="hd"></i></span><span class="sit" style="--shirt:#4caf7d"><i class="bd"></i><i class="hd"></i></span><i class="top"></i><i class="leg"></i></div>
           <div class="tbl t2" style="left:76%"><span class="sit" style="--shirt:#3b82f6"><i class="bd"></i><i class="hd"></i></span><span class="sit" style="--shirt:#f2b33d"><i class="bd"></i><i class="hd"></i></span><i class="top"></i><i class="leg"></i></div>
-          <div class="crowd"><span class="per q1" style="--shirt:#8e6cd8"><i class="lg l"></i><i class="lg r"></i><i class="bd"></i><i class="hd"></i></span><span class="per q2" style="--shirt:#26a69a"><i class="lg l"></i><i class="lg r"></i><i class="bd"></i><i class="hd"></i></span></div>
+          <div class="crowd"><span class="per q1" style="--shirt:#8e6cd8"><i class="lg l"></i><i class="lg r"></i><i class="bd"></i><i class="hd"></i><i class="ph"></i></span><span class="per q2" style="--shirt:#26a69a"><i class="lg l"></i><i class="lg r"></i><i class="bd"></i><i class="hd"></i><i class="ph"></i></span></div>
           <div class="road"><i class="lane"></i><span class="car c1"></span><span class="car c2"></span></div>
           <div class="ring"></div>
           <div class="rate ra"><em>2°</em>★ 4,9 · <b>26</b> reseñas</div>
           <div class="rate rb"><em>1°</em>★ 4,6 · <b>812</b> reseñas</div>
           <div class="per hero"><span class="bub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><span class="q">restaurante cerca</span></span><i class="lg l"></i><i class="lg r"></i><i class="bd"></i><i class="hd"></i><i class="ph"></i></div>
-          <div class="per p2"><i class="lg l"></i><i class="lg r"></i><i class="bd"></i><i class="hd"></i></div>
-          <div class="per p3"><i class="lg l"></i><i class="lg r"></i><i class="bd"></i><i class="hd"></i></div>
-          <div class="per p4"><i class="lg l"></i><i class="lg r"></i><i class="bd"></i><i class="hd"></i></div>
+          <div class="per wk w1" style="--shirt:#4caf7d"><i class="look">★ 4,6 · 812</i><i class="lg l"></i><i class="lg r"></i><i class="bd"></i><i class="hd"></i><i class="ph"></i></div>
+          <div class="per wk w2" style="--shirt:#8e6cd8"><i class="look">★ 4,6 · 812</i><i class="lg l"></i><i class="lg r"></i><i class="bd"></i><i class="hd"></i><i class="ph"></i></div>
+          <div class="per wk w3" style="--shirt:#e0507a"><i class="look">★ 4,6 · 812</i><i class="lg l"></i><i class="lg r"></i><i class="bd"></i><i class="hd"></i><i class="ph"></i></div>
+          <div class="per wk w4" style="--shirt:#26a69a"><i class="look">★ 4,6 · 812</i><i class="lg l"></i><i class="lg r"></i><i class="bd"></i><i class="hd"></i><i class="ph"></i></div>
+          <div class="per wk w5" style="--shirt:#f2b33d"><i class="look">★ 4,6 · 812</i><i class="lg l"></i><i class="lg r"></i><i class="bd"></i><i class="hd"></i><i class="ph"></i></div>
           <div class="pq-bubs"><span>★★★★★ ¡Riquísimo!</span><span>★★★★★ Volvemos seguro</span><span>★★★★★ Excelente atención</span></div>
           <small class="ej">Ejemplo</small>
         </div>
