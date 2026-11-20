@@ -720,6 +720,35 @@ html { scrollbar-width: none; } html::-webkit-scrollbar { display: none; }
 .cart-pill svg { width: 18px; height: 18px; }
 .cart-pill.bump { animation: addPop .45s ease; }
 @media (max-width: 899px) { .buy-btns { flex: 1 1 100%; } .buy-btns .btn, .cart-foot .btn { flex: 1 1 100%; } .cart-pill { margin-left: auto; } }
+
+#swatches button { display: grid; grid-template-columns: auto auto; justify-content: center; align-items: center; column-gap: 6px; row-gap: 1px; line-height: 1.15; }
+#swatches .sw-price { grid-column: 1 / -1; font-size: .74rem; opacity: .7; font-weight: 600; }
+
+/* panel del carrito */
+.cart-pill { border: 0; cursor: pointer; font: inherit; font-weight: 700; }
+.cd-back { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,.55); opacity: 0; transition: opacity .25s; }
+.cd-back.on { opacity: 1; }
+.cart-drawer { position: fixed; z-index: 201; right: 0; top: 0; bottom: 0; width: min(420px, 100%); padding: 20px 18px calc(20px + env(safe-area-inset-bottom, 0px));
+  background: #151513; border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: 14px; overflow-y: auto; transform: translateX(100%); transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+.cart-drawer.on { transform: none; }
+.cd-head { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; }
+.cd-close { width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(255,255,255,.1); color: inherit; font-size: 1.5rem; line-height: 1; cursor: pointer; }
+.cd-empty { color: var(--muted); }
+.cd-foot { margin-top: auto; display: grid; gap: 12px; padding-top: 14px; border-top: 1px solid var(--line); }
+.cd-foot .btn { width: 100%; justify-content: center; }
+.cd-links { display: flex; justify-content: space-between; }
+html.cd-open { overflow: hidden; }
+@media (max-width: 899px) {
+  .cart-drawer { top: auto; left: 0; width: 100%; max-height: 82svh; border-left: 0; border-top: 1px solid var(--line); border-radius: 22px 22px 0 0; transform: translateY(100%); }
+  .cart-drawer.on { transform: none; }
+}
+
+/* transición al tocar un link: fundido y la sección entra suave (sin bajar corriendo) */
+html { scroll-behavior: auto !important; }
+.nav-veil { position: fixed; inset: 0; z-index: 150; background: var(--bg); opacity: 0; pointer-events: none; transition: opacity .23s ease; }
+.nav-veil.on { opacity: 1; }
+.nav-in > * { animation: navIn .55s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes navIn { from { opacity: 0; transform: translateY(28px) scale(.985); } }
 </style>
 
 </head>
@@ -731,7 +760,18 @@ html { scrollbar-width: none; } html::-webkit-scrollbar { display: none; }
     <a href="#pedido">Armá tu pedido</a>
     <a href="#preguntas">Preguntas</a>
   </nav>
-<a class="cart-pill" id="cart-pill" href="#pedido" hidden aria-label="Ver carrito"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20.5" r="1.3"/><circle cx="17" cy="20.5" r="1.3"/></svg><b id="cart-n">0</b></a></div><div class="prog" id="prog" aria-hidden="true"></div></header>
+<button type="button" class="cart-pill" id="cart-pill" hidden aria-label="Ver carrito" aria-controls="cart-drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6.2"/><circle cx="10" cy="20.5" r="1.3"/><circle cx="17" cy="20.5" r="1.3"/></svg><b id="cart-n">0</b></button></div><div class="prog" id="prog" aria-hidden="true"></div></header>
+<div class="cd-back" id="cd-back" hidden></div>
+<aside class="cart-drawer" id="cart-drawer" role="dialog" aria-modal="true" aria-label="Tu carrito" hidden>
+  <div class="cd-head"><b>Tu carrito</b><button type="button" class="cd-close" id="cd-close" aria-label="Cerrar">×</button></div>
+  <ol class="cart-list" id="cd-list"></ol>
+  <p class="cd-empty" id="cd-empty" hidden>Tu carrito está vacío.</p>
+  <div class="cd-foot" id="cd-foot">
+    <div><div class="cart-total" id="cd-total">$0</div><div class="buy-sub" id="cd-sub"></div></div>
+    <a class="btn btn-wa" data-wa="cart" id="cd-send" target="_blank" rel="noopener" href="#">Enviar pedido por WhatsApp</a>
+    <div class="cd-links"><button type="button" class="cart-clear" id="cd-clear">Vaciar carrito</button><a href="#pedido" class="cart-clear" id="cd-more">Seguir armando</a></div>
+  </div>
+</aside>
 <div class="side-bar" aria-hidden="true"><i></i></div>
 <nav class="dots" id="dots" aria-label="Secciones de la página"></nav>
 <main>
@@ -1122,7 +1162,7 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
   }
   function renderCart() {
     var n = cartN(), box = $("#cart-box"), pill = $("#cart-pill");
-    box.hidden = !cart.length; if (pill) { pill.hidden = !cart.length; $("#cart-n").textContent = n; }
+    box.hidden = !cart.length; if (pill) { pill.hidden = !cart.length && $("#cart-drawer").hidden; $("#cart-n").textContent = n; }
     var ol = $("#cart-list"); ol.innerHTML = "";
     cart.forEach(function (it, i) {
       var li = document.createElement("li");
@@ -1131,8 +1171,17 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
       x.addEventListener("click", function () { cart.splice(i, 1); saveCart(); refreshUI(); });
       li.appendChild(x); ol.appendChild(li);
     });
+    var dl = $("#cd-list"); dl.innerHTML = "";
+    cart.forEach(function (it, i) {
+      var li = document.createElement("li"), t = document.createElement("span"); t.textContent = itemText(it); li.appendChild(t);
+      var x = document.createElement("button"); x.type = "button"; x.className = "cart-x"; x.textContent = "×"; x.setAttribute("aria-label", "Quitar del carrito");
+      x.addEventListener("click", function () { cart.splice(i, 1); saveCart(); refreshUI(); });
+      li.appendChild(x); dl.appendChild(li);
+    });
+    $("#cd-empty").hidden = !!cart.length; $("#cd-foot").hidden = !cart.length;
+    $("#cd-total").textContent = pesos(cartTotal());
     $("#cart-total").textContent = pesos(cartTotal());
-    $("#cart-sub").textContent = n + (n === 1 ? " tarjeta con su soporte" : " tarjetas con sus " + n + " soportes") + (n >= 5 ? " · precio por cantidad" : "");
+    $("#cd-sub").textContent = $("#cart-sub").textContent = n + (n === 1 ? " tarjeta con su soporte" : " tarjetas con sus " + n + " soportes") + (n >= 5 ? " · precio por cantidad" : "");
     var add = $("#add-btn"); add.disabled = !count();
     $("#buy-btn").hidden = !!cart.length;
   }
@@ -1191,6 +1240,21 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     setTimeout(function () { var r = $("#cart-box").getBoundingClientRect(); if (r.top > innerHeight - 80) $("#cart-box").scrollIntoView({ behavior: "smooth", block: "nearest" }); }, 60);
   });
   $("#cart-clear").addEventListener("click", function () { cart = []; saveCart(); refreshUI(); });
+  (function () {
+    var dr = $("#cart-drawer"), bk = $("#cd-back"), pill = $("#cart-pill");
+    function open(v) {
+      dr.hidden = bk.hidden = !v; pill.setAttribute("aria-expanded", String(v));
+      document.documentElement.classList.toggle("cd-open", v);
+      if (v) { requestAnimationFrame(function () { dr.classList.add("on"); bk.classList.add("on"); }); $("#cd-close").focus(); }
+      else { dr.classList.remove("on"); bk.classList.remove("on"); refreshUI(); }
+    }
+    pill.addEventListener("click", function () { open(dr.hidden); });
+    $("#cd-close").addEventListener("click", function () { open(false); });
+    bk.addEventListener("click", function () { open(false); });
+    $("#cd-more").addEventListener("click", function () { open(false); });
+    $("#cd-clear").addEventListener("click", function () { cart = []; saveCart(); refreshUI(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !dr.hidden) open(false); });
+  })();
   function set(key, val) { state[key] = val; refreshUI(); viewer.rebuild(false); if (key === "logo") { viewer.look(val); if (val) viewer.burn(true); } }
 
   CONFIG.soportes.forEach(function (s) {
@@ -1198,6 +1262,7 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     b.type = "button"; b.id = "sop-" + s.id; b.dataset.s = s.id;
     b.innerHTML = '<span class="stand-chip" aria-hidden="true"></span>'; b.firstChild.style.background = s.color;
     b.appendChild(document.createTextNode(s.boton)); b.setAttribute("aria-label", "Soporte de " + s.nombre.toLowerCase());
+    var pz = document.createElement("small"); pz.className = "sw-price"; pz.textContent = pesos(scaleOf(s.id)[1]); b.appendChild(pz);
     b.addEventListener("click", function () { set("stand", s.id); });
     $("#swatches").appendChild(b);
   });
@@ -1879,5 +1944,29 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
 </script>
 
 
+<div class="nav-veil" id="nav-veil" aria-hidden="true"></div>
+<script>
+(function () {
+  var veil = document.getElementById("nav-veil"), root = document.documentElement, busy = false;
+  var REDUCE = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.addEventListener("click", function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]'); if (!a) return;
+    var id = a.getAttribute("href"); if (id.length < 2) return;
+    var t = document.querySelector(id); if (!t) return;
+    e.preventDefault(); if (busy) return; busy = true;
+    var go = function () {
+      root.style.scrollBehavior = "auto";
+      window.scrollTo(0, t.getBoundingClientRect().top + window.pageYOffset - (id === "#inicio" ? 0 : 0));
+      root.style.scrollBehavior = "";
+      if (history.replaceState) history.replaceState(null, "", id);
+      t.classList.remove("nav-in"); void t.offsetWidth; if (!REDUCE) t.classList.add("nav-in");
+    };
+    if (REDUCE) { go(); busy = false; return; }
+    veil.classList.add("on");
+    setTimeout(function () { go(); requestAnimationFrame(function () { veil.classList.remove("on"); busy = false; }); }, 230);
+  }, true);
+})();
+</script>
 </body>
 </html>
