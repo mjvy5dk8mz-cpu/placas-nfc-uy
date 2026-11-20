@@ -678,6 +678,18 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
 }
 
 @media (min-width: 900px) { .pq-cue { left: max(36px, calc((100vw - 1240px) / 2 + 36px)); transform: none; justify-items: start; } }
+
+
+/* barra de scroll grande al costado (como la del celu pero bien visible) */
+.side-bar { position: fixed; z-index: 60; right: 5px; top: calc(70px + env(safe-area-inset-top, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); width: 7px; border-radius: 99px; background: rgba(255,255,255,.14); pointer-events: none; }
+.side-bar i { position: absolute; left: 0; right: 0; top: 0; height: 16%; border-radius: 99px; background: #fff; box-shadow: 0 0 0 1.5px rgba(0,0,0,.35), 0 0 12px rgba(255,255,255,.75);
+  transform: translateY(calc(var(--prog, 0) * 525%)); }
+.side-bar.hint i { animation: sbHint 1.3s ease-in-out infinite; }
+@keyframes sbHint { 0%, 100% { top: 0; } 50% { top: 5%; } }
+@media (min-width: 900px) { .side-bar { right: 3px; width: 9px; top: 90px; bottom: 24px; } }
+/* si no bajó en unos segundos, la escena hace un saltito para mostrar que se mueve */
+.pq-pin.nudge .pq-grid { animation: nudge 1s ease-in-out; }
+@keyframes nudge { 0%, 100% { transform: none; } 35% { transform: translateY(-26px); } 65% { transform: translateY(4px); } }
 </style>
 
 </head>
@@ -690,6 +702,7 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
     <a href="#preguntas">Preguntas</a>
   </nav>
 </div><div class="prog" id="prog" aria-hidden="true"></div></header>
+<div class="side-bar" aria-hidden="true"><i></i></div>
 <nav class="dots" id="dots" aria-label="Secciones de la página"></nav>
 <main>
   <section class="sec porque" id="por-que" data-nombre="Por qué" data-step="0" aria-label="Por qué Google muestra un restaurante primero">
@@ -730,7 +743,7 @@ h2 { font-size: clamp(2rem, 5.6vw, 3.6rem); }
           <small class="ej">Ejemplo</small>
         </div>
       </div>
-      <div class="pq-cue"><span>Bajá</span><i></i></div>
+      
     </div>
   </section>
 
@@ -1695,7 +1708,7 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     function update() {
       ticking = false;
       var vh = window.innerHeight, max = root.scrollHeight - vh, y = window.pageYOffset;
-      prog.style.setProperty("--prog", max > 0 ? (y / max).toFixed(4) : 0);
+      prog.style.setProperty("--prog", max > 0 ? (y / max).toFixed(4) : 0); var sbx = document.querySelector(".side-bar"); if (sbx) sbx.style.setProperty("--prog", max > 0 ? (y / max).toFixed(4) : 0);
       var act = 0;
       secs.forEach(function (sc, i) { if (sc.getBoundingClientRect().top <= vh * 0.5) act = i; });
       if (act !== cur) { cur = act; links.forEach(function (a, i) { a.setAttribute("aria-current", String(i === act)); }); }
@@ -1728,6 +1741,32 @@ var PRECIO_BAMBU = 0, PRECIO_PINO = 0, PRECIO_QUEMADO = 0;
     window.addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
     window.addEventListener("resize", update); update();
   })();
+  /* tocar el aviso = siguiente paso; y si no bajó en 3,5 s, la escena hace un saltito */
+  (function () {
+    var sec = $("#por-que"); if (!sec) return;
+    var pin = sec.querySelector(".pq-pin"), moved = false, sb = document.querySelector(".side-bar");
+    if (sb) sb.classList.add("hint");
+    window.addEventListener("scroll", function () { if (window.pageYOffset > 30) { moved = true; if (sb) sb.classList.remove("hint"); } }, { passive: true });
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var n = 0, t = setInterval(function () {
+      if (moved || ++n > 3) { clearInterval(t); return; }
+      pin.classList.remove("nudge"); void pin.offsetWidth; pin.classList.add("nudge");
+    }, 3500);
+  })();
+
+/* el celu de la demo muestra la hora y el día de Uruguay */
+(function () {
+  function tick() {
+    try {
+      var d = new Date(), tz = "America/Montevideo";
+      var hm = new Intl.DateTimeFormat("es-UY", { timeZone: tz, hour: "numeric", minute: "2-digit", hourCycle: "h23" }).format(d);
+      var dia = new Intl.DateTimeFormat("es-UY", { timeZone: tz, weekday: "long", day: "numeric", month: "long" }).format(d).replace(",", "");
+      document.querySelectorAll(".sbar b, .lock-time").forEach(function (e) { e.textContent = hm; });
+      document.querySelectorAll(".lock-date").forEach(function (e) { e.textContent = dia; });
+    } catch (e) {}
+  }
+  tick(); setInterval(tick, 15000);
+})();
 })();
 </script>
 
